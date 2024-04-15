@@ -1,6 +1,6 @@
 import Avatar from '@components/@common/Avatar/Avatar';
 import ThemeButton from '@components/@common/ThemeButton/ThemeButton';
-import { authAtom } from '@store/atoms/auth';
+import { baseAuthAtom } from '@store/atoms/auth';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { login, logout } from 'src/api/firebase';
@@ -8,7 +8,7 @@ import styles from './Header.module.css';
 const cx = classnames.bind(styles);
 
 const Header = () => {
-    const user = useAtomValue(authAtom);
+    const user = useAtomValue(baseAuthAtom);
     return (
         <header id={cx('header')}>
             <div className={cx('header')}>

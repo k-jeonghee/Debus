@@ -6,7 +6,12 @@ export type UserTypes = {
     displayName: string | null;
     photoURL: string | null;
     email: string | null;
-} | null;
+};
 
-export const authAtom = atom<UserTypes | null>(null);
-authAtom.onMount = (set) => onUserStateChange(set);
+export const baseAuthAtom = atom<UserTypes | null>(null);
+export const authAtom = atom<Promise<UserTypes>>((get) => {
+    const x = get(baseAuthAtom);
+    if (!x) return new Promise(() => {});
+    return Promise.resolve(x);
+});
+baseAuthAtom.onMount = (set) => onUserStateChange(set);
