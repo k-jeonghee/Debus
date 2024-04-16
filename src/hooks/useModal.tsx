@@ -35,7 +35,7 @@ export const useModal = () => {
         const modal = modals.find((modal) => modal.modalId === modalId);
         return (
             modal && (
-                <ModalPortal portalContainer={portalRef.current}>
+                <ModalPortal portalContainer={portalRef.current} key={modal.modalId}>
                     <Modal modal={modal} />
                 </ModalPortal>
             )
