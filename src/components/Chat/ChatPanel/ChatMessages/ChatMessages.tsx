@@ -1,4 +1,6 @@
+import { useMessageByIdQuery } from '@hooks/services/queries/chat';
 import { authAtom } from '@store/atoms/auth';
+import { currentChatRoom } from '@store/atoms/chat';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import moment from 'moment';
@@ -12,6 +14,8 @@ type PropsType = {
 
 const ChatMessages = ({ message }: PropsType) => {
     const { uid } = useAtomValue(authAtom);
+    const chatRoomId = useAtomValue(currentChatRoom);
+    const { data } = useMessageByIdQuery({ chatRoomId, messageId: message.id });
     const isMyMessage = uid === message.user.id;
     const timeAgo = moment(Number(message.timestamp)).fromNow();
 
@@ -20,10 +24,10 @@ const ChatMessages = ({ message }: PropsType) => {
             <div className={cx('user-img')}></div>
             <div>
                 <div className={cx('info')}>
-                    <strong className={cx('user-name')}>{message.user.name}</strong>
+                    <strong className={cx('user-name')}>{data.user.name}</strong>
                     <span className={cx('timestamp')}>{timeAgo}</span>
                 </div>
-                <p className={cx('content')}>{message.content}</p>
+                <p className={cx('content')}>{data.content}</p>
             </div>
         </div>
     );
