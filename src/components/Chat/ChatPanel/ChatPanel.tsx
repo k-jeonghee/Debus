@@ -1,5 +1,5 @@
 import ChatForm from '@components/Chat/ChatPanel/ChatForm/ChatForm';
-import ChatMessages from '@components/Chat/ChatPanel/ChatMessages/ChatMessages';
+import ChatMessage from '@components/Chat/ChatPanel/ChatMessage/ChatMessage';
 
 import { useMessageQuery } from '@hooks/services/queries/chat';
 import classnames from 'classnames/bind';
@@ -14,7 +14,7 @@ const ChatPanel = ({ id }: { id: string }) => {
 
     useEffect(() => addMessageListener(id, () => refetch()), [id, refetch]);
 
-    const messages$ = data.map((message) => <ChatMessages key={message.id} message={message} />);
+    const messages$ = data.map((message) => <ChatMessage key={message.id} message={message} />);
 
     return (
         <div className={cx('container')}>
