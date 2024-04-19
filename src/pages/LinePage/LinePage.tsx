@@ -1,7 +1,7 @@
 import Loading from '@components/@common/Loading/Loading';
-import ChatPanel from '@components/ChatRoom/ChatPanel/ChatPanel';
-import SidePanel from '@components/ChatRoom/SidePanel/SidePanel';
-import { currentChatRoom } from '@store/atoms/chatRoom';
+import ChatPanel from '@components/Chat/ChatPanel/ChatPanel';
+import SidePanel from '@components/Chat/SidePanel/SidePanel';
+import { currentChatRoom } from '@store/atoms/chat';
 import classnames from 'classnames/bind';
 import { useAtom } from 'jotai';
 import { Suspense, useEffect } from 'react';
@@ -20,16 +20,16 @@ const LinePage = () => {
     }, [id, setCurrentChatRoomId]);
 
     return (
-        <div className={cx('container')}>
-            <div className={cx('side')}>
-                <SidePanel id={currentChatRoomId} />
-            </div>
-            <div className={cx('chat')}>
-                <Suspense fallback={<Loading />}>
+        <Suspense fallback={<Loading />}>
+            <div className={cx('container')}>
+                <div className={cx('side')}>
+                    <SidePanel id={currentChatRoomId} />
+                </div>
+                <div className={cx('chat')}>
                     <ChatPanel id={currentChatRoomId} />
-                </Suspense>
+                </div>
             </div>
-        </div>
+        </Suspense>
     );
 };
 
