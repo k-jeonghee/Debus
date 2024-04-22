@@ -15,17 +15,25 @@ type PropsType = {
 const ChatMessage = ({ message }: PropsType) => {
     const { uid } = useAtomValue(authAtom);
     const chatRoomId = useAtomValue(currentChatRoom);
-    const { data } = useMessageByIdQuery({ chatRoomId, messageId: message.id });
+    const {
+        data: { content, file, user },
+    } = useMessageByIdQuery({ chatRoomId, messageId: message.id });
     const isMyMessage = uid === message.user.id;
     const timeAgo = moment(Number(message.timestamp)).format('HH:mm');
 
     return (
         <div className={cx('container', { me: isMyMessage })}>
-            <div className={cx('user-img')}></div>
-            <strong className={cx('user-name')}>{data.user.name}</strong>
+            <div className={cx('profile')}></div>
             <div className={cx('info')}>
-                <p className={cx('content')}>{data.content}</p>
-                <span className={cx('timestamp')}>{timeAgo}</span>
+                <strong className={cx('user-name')}>{user.name}</strong>
+                <div className={cx('content')}>
+                    {file ? (
+                        <img className={cx('file-img')} src={file} alt="이미지" />
+                    ) : (
+                        <p className={cx('text')}>{content}</p>
+                    )}
+                    <span className={cx('timestamp')}>{timeAgo}</span>
+                </div>
             </div>
         </div>
     );
