@@ -3,10 +3,14 @@ import { authAtom } from '@store/atoms/auth';
 import { currentChatRoom } from '@store/atoms/chat';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
-import { KeyboardEventHandler, useCallback, useState } from 'react';
+import { ChangeEvent, KeyboardEventHandler, useCallback, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { BsPlusCircleFill } from 'react-icons/bs';
 import { PiPaperPlaneTiltFill } from 'react-icons/pi';
+import { PuffLoader } from 'react-spinners';
+import { Message } from 'src/@types/chat';
+import { uploadImage } from 'src/api/uploader';
+import { assert } from 'src/utils/assert';
 import styles from './ChatForm.module.css';
 const cx = classnames.bind(styles);
 
@@ -14,48 +18,61 @@ type FormData = {
     content: string;
 };
 
+type TextMessage = {
+    content: string;
+};
+
+type FileMessage = {
+    file: string;
+};
+
+type MessageData = TextMessage | FileMessage;
+
 const ChatForm = () => {
     const chatRoomId = useAtomValue(currentChatRoom);
     const user = useAtomValue(authAtom);
-    const { register, handleSubmit, reset, watch, getValues } = useForm<FormData>();
     const [textareaHeight, setTextareaHeight] = useState(17);
+    const { register, handleSubmit, reset, watch, getValues } = useForm<FormData>();
     const value = watch('content');
     const { mutate } = useMessageMutation(chatRoomId);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const handleCreateMessage: SubmitHandler<FormData> = (data) => {
-        const content = data.content;
-
-        if (!content || content.trim() === '') return;
-
-        const message = {
-            content,
+    //메시지 객체 반환
+    const createMessage = (data: MessageData) => {
+        const message: Omit<Message, 'id' | 'timestamp'> = {
+            ...data,
             user: {
                 id: user.uid,
                 name: user.displayName ?? 'noname',
             },
         };
 
+        return message;
+    };
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>파일 업로드
+    const handleOpenFile = () => {
+        assert(fileInputRef.current !== null, '파일 참조가 없습니다.');
+        fileInputRef.current.click();
+    };
+
+    const handleChange = async (event: ChangeEvent<HTMLInputElement>) => {
+        const { files } = event.target;
+        const file = files && files[0];
+        assert(file !== null, '업로드 된 파일이 없습니다.');
+        setIsLoading(true);
         try {
-            mutate({ chatRoomId, message });
+            const downloadUrl = await uploadImage(chatRoomId, file);
+            mutate({ chatRoomId, message: createMessage({ file: downloadUrl }) });
+            setIsLoading(false);
         } catch (err) {
             console.log(err);
         }
-
-        setTextareaHeight(17);
-        reset();
     };
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<파일 업로드
 
-    const handleEnterSubmit: KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
-        if (e.key !== 'Enter') return;
-        if (e.shiftKey) return;
-        if (!e.nativeEvent.isComposing) {
-            e.preventDefault();
-            handleCreateMessage({
-                content: value,
-            });
-        }
-    };
-
+    //입력된 글자에 따라 teatarea height 조정
     const resizeTextareaHeight = useCallback(
         (value: string) => {
             const lineHeight = 17;
@@ -66,10 +83,38 @@ const ChatForm = () => {
         [textareaHeight],
     );
 
+    //텍스트 메시지 전송
+    const handleAddMessage: SubmitHandler<FormData> = (data) => {
+        const content = data.content;
+
+        if (!content || content.trim() === '') return;
+
+        try {
+            mutate({ chatRoomId, message: createMessage({ content }) });
+        } catch (err) {
+            console.log(err);
+        }
+
+        setTextareaHeight(17);
+        reset();
+    };
+
+    //Enter Submit
+    const handleEnterSubmit: KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
+        if (e.key !== 'Enter') return;
+        if (e.shiftKey) return;
+        if (!e.nativeEvent.isComposing) {
+            e.preventDefault();
+            handleAddMessage({
+                content: value,
+            });
+        }
+    };
+
     return (
         <div className={cx('container')}>
             <div className={cx('inner-form-container')}>
-                <form onSubmit={handleSubmit(handleCreateMessage)}>
+                <form onSubmit={handleSubmit(handleAddMessage)}>
                     <textarea
                         className={cx('text-input')}
                         style={{ height: textareaHeight + 'px' }}
@@ -82,8 +127,12 @@ const ChatForm = () => {
                         autoFocus
                     ></textarea>
                     <div className={cx('footer')}>
-                        <button className={cx('file-btn')}>
-                            <BsPlusCircleFill />
+                        <button className={cx('file-btn')} onClick={handleOpenFile} disabled={isLoading}>
+                            {isLoading ? (
+                                <PuffLoader color="#ff6636" loading size={24} />
+                            ) : (
+                                <BsPlusCircleFill className={cx({ disabled: isLoading })} />
+                            )}
                         </button>
                         <button type="submit" className={cx('submit-btn', { active: value })} disabled={!value}>
                             <PiPaperPlaneTiltFill />
@@ -91,6 +140,13 @@ const ChatForm = () => {
                     </div>
                 </form>
             </div>
+            <input
+                type="file"
+                accept="/image/*"
+                ref={fileInputRef}
+                onChange={handleChange}
+                style={{ display: 'none' }}
+            />
         </div>
     );
 };

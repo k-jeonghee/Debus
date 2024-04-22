@@ -24,7 +24,8 @@ export type Member = {
 
 export type Message = {
     id: string;
-    content: string;
+    content?: string;
+    file?: string;
     timestamp: unknown;
     user: {
         id: string;
