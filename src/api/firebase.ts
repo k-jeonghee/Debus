@@ -14,6 +14,7 @@ import {
     serverTimestamp,
     set,
 } from 'firebase/database';
+import { getStorage } from 'firebase/storage';
 
 import { ChatRoomInfo, ChatRoomInfoType, Message } from 'src/@types/chat';
 import { assert } from 'src/utils/assert';
@@ -23,11 +24,13 @@ const firebaseConfig = {
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
     databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
+export const storage = getStorage(app);
 
 const provider = new GoogleAuthProvider();
 
@@ -101,7 +104,7 @@ export const getChatRoom = async (id: string): Promise<DataSnapshot> =>
         return [];
     });
 
-const messagesRef = ref(db, 'messages');
+export const messagesRef = ref(db, 'messages');
 export const addNewMessage: MutationFunction<
     Message,
     { chatRoomId: string; message: Omit<Message, 'id' | 'timestamp'> }
