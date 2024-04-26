@@ -1,6 +1,7 @@
 import Modal from '@components/@common/Modal/Modal';
 import ModalPortal from '@components/@common/Modal/ModalPortal';
 import { ComponentType, createElement, useCallback, useContext, useEffect, useId } from 'react';
+import { AlertModalProps } from 'src/@types/modal';
 import { modalContext } from 'src/context/ModalContext';
 import { assert } from 'src/utils/assert';
 
@@ -31,6 +32,26 @@ export const useModal = () => {
         [modalId, open, closeModal],
     );
 
+    const openAlertModal = useCallback(
+        <P extends AlertModalProps>(component: ComponentType<P>, props: P) =>
+            new Promise((resolve, reject) => {
+                const modal = {
+                    element: createElement(component, { ...props }),
+                    modalId,
+                    resolve: <T extends {}>(value?: T) => {
+                        resolve(value);
+                        closeModal();
+                    },
+                    reject: (reason?: Error) => {
+                        reject(reason);
+                        closeModal();
+                    },
+                };
+                open(modal);
+            }),
+        [modalId, open, closeModal],
+    );
+
     const renderModal = useCallback(() => {
         const modal = modals.find((modal) => modal.modalId === modalId);
         return (
@@ -44,5 +65,5 @@ export const useModal = () => {
 
     useEffect(() => closeModal, [closeModal]);
 
-    return { openModal, closeModal, renderModal };
+    return { openModal, openAlertModal, closeModal, renderModal };
 };

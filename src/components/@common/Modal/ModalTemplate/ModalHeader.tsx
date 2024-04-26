@@ -4,7 +4,7 @@ import { IoIosClose } from 'react-icons/io';
 import styles from './ModalTemplate.module.css';
 const cx = classnames.bind(styles);
 
-const ModalHeader = ({ title, onClose }: { title: string; onClose?: () => void }) => {
+const ModalHeader = ({ title = '', onClose }: { title?: string; onClose?: () => void }) => {
     return (
         <header className={cx('modal-header')}>
             <h1 className={cx('title')}>{title}</h1>
