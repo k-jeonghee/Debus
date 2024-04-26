@@ -17,7 +17,6 @@ export const useChatRoomQuery: (chatRoomId: string) => UseSuspenseQueryResult<Ch
             queryKey: chatKeys.chatRoomById(chatRoomId),
             queryFn: () => getChatRoom(chatRoomId),
             staleTime: 5 * 1000,
-            refetchOnWindowFocus: false,
         }),
     );
 
@@ -26,7 +25,6 @@ export const useMessageQuery = (chatRoomId: string) =>
         queryKey: chatKeys.messages(chatRoomId),
         queryFn: () => getMessages(chatRoomId),
         staleTime: 60 * 1000,
-        refetchOnWindowFocus: false,
     });
 
 export const useMessageByIdQuery = ({ chatRoomId, messageId }: { chatRoomId: string; messageId: string }) =>
@@ -34,5 +32,4 @@ export const useMessageByIdQuery = ({ chatRoomId, messageId }: { chatRoomId: str
         queryKey: chatKeys.messageById(chatRoomId, messageId),
         queryFn: () => getMessage({ chatRoomId, messageId }),
         staleTime: 60 * 1000,
-        refetchOnWindowFocus: false,
     });
