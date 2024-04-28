@@ -11,26 +11,26 @@ import styles from './LinePage.module.css';
 const cx = classnames.bind(styles);
 
 const LinePage = () => {
-    const [currentChatRoomId, setCurrentChatRoomId] = useAtom(currentChatRoom);
-    const { id } = useParams();
-    assert(id !== undefined, '채팅방 id가 존재하지 않습니다.');
+  const [currentChatRoomId, setCurrentChatRoomId] = useAtom(currentChatRoom);
+  const { id } = useParams();
+  assert(id !== undefined, '채팅방 id가 존재하지 않습니다.');
 
-    useEffect(() => {
-        setCurrentChatRoomId(id);
-    }, [id, setCurrentChatRoomId]);
+  useEffect(() => {
+    setCurrentChatRoomId(id);
+  }, [id, setCurrentChatRoomId]);
 
-    return (
-        <Suspense fallback={<Loading />}>
-            <div className={cx('container')}>
-                <div className={cx('side')}>
-                    <SidePanel id={currentChatRoomId} />
-                </div>
-                <div className={cx('chat')}>
-                    <ChatPanel id={currentChatRoomId} />
-                </div>
-            </div>
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={<Loading />}>
+      <div className={cx('container')}>
+        <div className={cx('side')}>
+          <SidePanel chatRoomId={currentChatRoomId} />
+        </div>
+        <div className={cx('chat')}>
+          <ChatPanel chatRoomId={currentChatRoomId} />
+        </div>
+      </div>
+    </Suspense>
+  );
 };
 
 export default LinePage;
