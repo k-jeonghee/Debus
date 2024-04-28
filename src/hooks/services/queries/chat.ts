@@ -1,35 +1,34 @@
-import { UseSuspenseQueryResult, queryOptions, useSuspenseQuery } from '@tanstack/react-query';
-import { ChatRoomInfoType } from 'src/@types/chat';
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { getChatRoom, getMessage, getMessages } from 'src/api/firebase';
 
-export const chatKeys = {
-    chatRooms: ['chatRooms'] as const,
-    chatRoomById: (chatRoomId: string) => [...chatKeys.chatRooms, chatRoomId] as const,
-    messages: (chatRoomId: string) => [...chatKeys.chatRoomById(chatRoomId), 'messages'] as const,
-    messageById: (chatRoomId: string, messageId: string) => [...chatKeys.messages(chatRoomId), messageId] as const,
-};
+const useChatRoomQuery = (chatRoomId: string) => useSuspenseQuery(chatRoomQueryOptions(chatRoomId));
+export const chatRoomQueryOptions = <T>(chatRoomId: string, options?: T) =>
+  queryOptions({
+    queryKey: ['chatRooms', chatRoomId],
+    queryFn: () => getChatRoom(chatRoomId),
+    staleTime: 5 * 1000,
+    ...options,
+  });
 
-export const useChatRoomQuery: (chatRoomId: string) => UseSuspenseQueryResult<ChatRoomInfoType> = (
-    chatRoomId: string,
-) =>
-    useSuspenseQuery(
-        queryOptions({
-            queryKey: chatKeys.chatRoomById(chatRoomId),
-            queryFn: () => getChatRoom(chatRoomId),
-            staleTime: 5 * 1000,
-        }),
-    );
+const useMessageQuery = (chatRoomId: string) => useSuspenseQuery(messageQueryOptions(chatRoomId));
+export const messageQueryOptions = <T>(chatRoomId: string, options?: T) =>
+  queryOptions({
+    queryKey: ['chatRooms', chatRoomId, 'messages'],
+    queryFn: () => getMessages(chatRoomId),
+    ...options,
+  });
 
-export const useMessageQuery = (chatRoomId: string) =>
-    useSuspenseQuery({
-        queryKey: chatKeys.messages(chatRoomId),
-        queryFn: () => getMessages(chatRoomId),
-        staleTime: 60 * 1000,
-    });
+const useMessageByIdQuery = (chatRoomId: string, messageId: string) =>
+  useSuspenseQuery(messageByIdQueryOptions(chatRoomId, messageId));
+export const messageByIdQueryOptions = <T>(chatRoomId: string, messageId: string, options?: T) =>
+  queryOptions({
+    queryKey: ['chatRooms', chatRoomId, 'messages', messageId],
+    queryFn: () => getMessage({ chatRoomId, messageId }),
+    staleTime: 60 * 1000,
+    ...options,
+  });
 
-export const useMessageByIdQuery = ({ chatRoomId, messageId }: { chatRoomId: string; messageId: string }) =>
-    useSuspenseQuery({
-        queryKey: chatKeys.messageById(chatRoomId, messageId),
-        queryFn: () => getMessage({ chatRoomId, messageId }),
-        staleTime: 60 * 1000,
-    });
+export const useChatRoom = (chatRoomId: string) => useChatRoomQuery(chatRoomId).data;
+export const useMessage = (chatRoomId: string) => useMessageQuery(chatRoomId).data;
+export const useMessageById = (chatRoomId: string, messageId: string) =>
+  useMessageByIdQuery(chatRoomId, messageId).data;
