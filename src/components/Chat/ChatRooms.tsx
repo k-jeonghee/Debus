@@ -10,19 +10,16 @@ import { login } from 'src/api/firebase';
 const ChatRooms = () => {
   const user = useAtomValue(baseAuthAtom);
   const navigate = useNavigate();
-  const { openModal, renderModal } = useModal();
-  const { createChatRoom } = useCreateChatRoom();
+  const { openModal, ModalContainer } = useModal();
+  const { mutate } = useCreateChatRoom({
+    onSuccess: (chatRoomId: string) => navigate(`/lines/${chatRoomId}`),
+  });
 
   const handleCreate = async () => {
     if (!user) return login();
     try {
       const chatRoomInfo = await openModal(CreateChatRoomModal);
-      createChatRoom(
-        { user, chatRoomInfo },
-        {
-          onSuccess: (chatRoomId: string) => navigate(`/lines/${chatRoomId}`),
-        },
-      );
+      mutate({ user, chatRoomInfo });
     } catch (err) {
       console.log('모달 닫습니다~!');
     }
@@ -36,7 +33,7 @@ const ChatRooms = () => {
           <Button text="배차하기" variant="accent" onClick={handleCreate} />
         </nav>
       </section>
-      {renderModal()}
+      <ModalContainer />
     </>
   );
 };
