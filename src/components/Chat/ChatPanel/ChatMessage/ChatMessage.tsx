@@ -2,8 +2,9 @@ import { useMessageById } from '@hooks/services/queries/chat';
 import { authAtom } from '@store/atoms/auth';
 import { currentChatRoom } from '@store/atoms/chat';
 import classnames from 'classnames/bind';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import { useAtomValue } from 'jotai';
-import moment from 'moment';
 import { memo } from 'react';
 import { Message } from 'src/@types/chat';
 import styles from './ChatMessage.module.css';
@@ -18,7 +19,7 @@ const ChatMessage = ({ message }: PropsType) => {
   const chatRoomId = useAtomValue(currentChatRoom);
   const { content, file, user } = useMessageById(chatRoomId, message.id);
   const isMyMessage = uid === message.user.id;
-  const timeAgo = moment(Number(message.timestamp)).format('HH:mm');
+  const timeAgo = format(Number(message.timestamp), 'a HH:mm', { locale: ko });
 
   return (
     <div className={cx('container', { me: isMyMessage })}>
