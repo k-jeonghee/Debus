@@ -14,4 +14,12 @@ export type ModalContentProps<T = unknown> = {
     onAbort: (error?: Error) => void; // catch
 };
 
-export type ModalStyle = 'global' | 'local';
+export type ActionModalProps = {
+    actionType: ActionType;
+    desc: string;
+    onSubmit?: (result: boolean) => void; // then
+    onAbort?: (error?: Error) => void; // catch
+};
+
+export type ModalStyle = 'global' | 'local' | 'alert';
+export type ActionType = 'confirm' | 'delete';
