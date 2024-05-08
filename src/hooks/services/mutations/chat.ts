@@ -1,26 +1,19 @@
+import { messageQueryOptions } from '@hooks/services/queries/chat';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { addNewMessage, createChatRoom as mutateChatRoom } from 'src/api/firebase';
+import { addNewMessage, createChatRoom } from 'src/api/firebase';
 
-const useChatRoomMutation = () => {
-  const { mutate: createChatRoom } = useMutation({
-    mutationFn: mutateChatRoom,
+export const useCreateChatRoom = ({ onSuccess }: { onSuccess: (chatRoomId: string) => void }) =>
+  useMutation({
+    mutationFn: createChatRoom,
+    onSuccess,
     onError: (err) => console.log(err),
   });
-  return { createChatRoom };
-};
 
-export const useMessageMutation = (chatRoomId: string) => {
+export const useAddMessage = (chatRoomId: string) => {
   const queryClient = useQueryClient();
-  const { mutate: addMessage } = useMutation({
+  return useMutation({
     mutationFn: addNewMessage,
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ['chatRooms', chatRoomId, 'messages'],
-      }),
+    onSuccess: () => queryClient.invalidateQueries(messageQueryOptions(chatRoomId)),
     onError: (err) => alert(`${err} 잠시 후 다시 시도해주세요.`),
   });
-  return { addMessage };
 };
-
-export const useCreateChatRoom = () => useChatRoomMutation();
-export const useAddMessage = useMessageMutation;

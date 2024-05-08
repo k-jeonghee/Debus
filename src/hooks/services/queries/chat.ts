@@ -1,7 +1,6 @@
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { getChatRoom, getMessage, getMessages } from 'src/api/firebase';
 
-const useChatRoomQuery = (chatRoomId: string) => useSuspenseQuery(chatRoomQueryOptions(chatRoomId));
 export const chatRoomQueryOptions = <T>(chatRoomId: string, options?: T) =>
   queryOptions({
     queryKey: ['chatRooms', chatRoomId],
@@ -10,7 +9,6 @@ export const chatRoomQueryOptions = <T>(chatRoomId: string, options?: T) =>
     ...options,
   });
 
-const useMessageQuery = (chatRoomId: string) => useSuspenseQuery(messageQueryOptions(chatRoomId));
 export const messageQueryOptions = <T>(chatRoomId: string, options?: T) =>
   queryOptions({
     queryKey: ['chatRooms', chatRoomId, 'messages'],
@@ -18,8 +16,6 @@ export const messageQueryOptions = <T>(chatRoomId: string, options?: T) =>
     ...options,
   });
 
-const useMessageByIdQuery = (chatRoomId: string, messageId: string) =>
-  useSuspenseQuery(messageByIdQueryOptions(chatRoomId, messageId));
 export const messageByIdQueryOptions = <T>(chatRoomId: string, messageId: string, options?: T) =>
   queryOptions({
     queryKey: ['chatRooms', chatRoomId, 'messages', messageId],
@@ -28,7 +24,7 @@ export const messageByIdQueryOptions = <T>(chatRoomId: string, messageId: string
     ...options,
   });
 
-export const useChatRoom = (chatRoomId: string) => useChatRoomQuery(chatRoomId).data;
-export const useMessage = (chatRoomId: string) => useMessageQuery(chatRoomId).data;
+export const useChatRoom = (chatRoomId: string) => useSuspenseQuery(chatRoomQueryOptions(chatRoomId)).data;
+export const useMessage = (chatRoomId: string) => useSuspenseQuery(messageQueryOptions(chatRoomId)).data;
 export const useMessageById = (chatRoomId: string, messageId: string) =>
-  useMessageByIdQuery(chatRoomId, messageId).data;
+  useSuspenseQuery(messageByIdQueryOptions(chatRoomId, messageId)).data;

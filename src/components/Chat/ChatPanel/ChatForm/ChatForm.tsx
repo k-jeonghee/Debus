@@ -34,7 +34,7 @@ const ChatForm = () => {
   const [textareaHeight, setTextareaHeight] = useState(17);
   const { register, handleSubmit, reset, watch, getValues } = useForm<FormData>();
   const value = watch('content');
-  const { addMessage } = useAddMessage(chatRoomId);
+  const { mutate } = useAddMessage(chatRoomId);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -64,7 +64,7 @@ const ChatForm = () => {
     setIsLoading(true);
     try {
       const downloadUrl = await uploadImage(chatRoomId, file);
-      addMessage({ chatRoomId, message: createMessage({ file: downloadUrl }) });
+      mutate({ chatRoomId, message: createMessage({ file: downloadUrl }) });
       setIsLoading(false);
     } catch (err) {
       console.log(err);
@@ -90,7 +90,7 @@ const ChatForm = () => {
     if (!content || content.trim() === '') return;
 
     try {
-      addMessage({ chatRoomId, message: createMessage({ content }) });
+      mutate({ chatRoomId, message: createMessage({ content }) });
     } catch (err) {
       console.log(err);
     }
@@ -125,7 +125,7 @@ const ChatForm = () => {
             onKeyDown={handleEnterSubmit}
             placeholder="내용을 입력해주세요"
             autoFocus
-          ></textarea>
+          />
           <div className={cx('footer')}>
             <button className={cx('file-btn')} onClick={handleOpenFile} disabled={isLoading}>
               {isLoading ? (
