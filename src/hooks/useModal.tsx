@@ -32,6 +32,26 @@ export const useModal = () => {
     [modalId, open, closeModal],
   );
 
+  const openActionModal = useCallback(
+    <P extends ActionModalProps>(component: ComponentType<P>, props: P) =>
+      new Promise((resolve, reject) => {
+        const modal = {
+          element: createElement(component, { ...props }),
+          modalId,
+          resolve: <T extends {}>(value?: T) => {
+            resolve(value);
+            closeModal();
+          },
+          reject: (reason?: Error) => {
+            reject(reason);
+            closeModal();
+          },
+        };
+        open(modal);
+      }),
+    [modalId, open, closeModal],
+  );
+
   const ModalContainer = useCallback(() => {
     const modal = modals.find((modal) => modal.modalId === modalId);
     return modal ? (
@@ -43,7 +63,6 @@ export const useModal = () => {
     );
   }, [modals, modalId, portalRef]);
 
-
   useEffect(() => closeModal, [closeModal]);
-  return { openModal, closeModal, ModalContainer };
+  return { openModal, closeModal, openActionModal, ModalContainer };
 };
