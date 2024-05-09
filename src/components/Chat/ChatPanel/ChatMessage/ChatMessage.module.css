@@ -1,0 +1,73 @@
+.container {
+    display: flex;
+    margin-bottom: 20px;
+    align-items: start;
+}
+
+.container.me {
+    justify-content: end;
+    margin-bottom: 12px;
+}
+
+.container.me .profile,
+.container.me .user-name {
+    display: none;
+}
+
+.profile {
+    width: 36px;
+    height: 36px;
+    background: #eee;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.user-name {
+    font-size: 0.7rem;
+    margin-right: 8px;
+    font-weight: 400;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.content {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.container.me .content {
+    flex-direction: row-reverse;
+}
+
+.timestamp {
+    font-size: 0.8rem;
+    color: #b0b0b0;
+}
+
+.text {
+    font-size: 0.8rem;
+    font-weight: 400;
+    background: #d6d6d65a;
+    padding: 12px;
+    border-radius: 12px;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.container.me .text {
+    background: #ff6636;
+    color: white;
+}
+
+.file-img {
+    width: 300px;
+    height: 240px;
+    background-size: auto;
+    border-radius: 16px;
+}
