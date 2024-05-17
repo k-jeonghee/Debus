@@ -2,43 +2,45 @@
 @import './reset.css';
 
 :root {
-    --color-bg: #fdfffd;
-    --color-bg-dark: white;
-    --color-white: white;
-    --color-text: #1d2026;
-    --color-gray-900: #1d2026;
-    --color-accent: #ff6636;
-    --color-btn-hover: #1d202610;
-    --color-bg-side: #ffece9;
+  --color-bg: #fdfffd;
+  --color-bg-dark: white;
+  --color-white: white;
+  --color-text: #1d2026;
+  --color-gray-900: #1d2026;
+  --color-gray-300: #f1f1f1;
+  --color-accent: #ff6636;
+  --color-btn-hover: #1d202610;
+  --color-bg-side: #f8f8f8;
 }
 
 * {
-    font-family: 'Spoqa Han Sans Neo', sans-serif;
-    box-sizing: border-box;
+  font-family: 'Spoqa Han Sans Neo', sans-serif;
+  box-sizing: border-box;
 }
 
 #app {
-    background: var(--color-bg);
-    color: var(--color-text);
-    height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  height: 100%;
 }
 
 #app.dark {
-    --color-bg: #1d2026;
-    --color-bg-dark: #191b20;
-    --color-text: white;
-    --color-gray-900: white;
-    --color-btn-hover: #ffffff10;
-    --color-bg-side: #191b20;
+  --color-bg: #1d2026;
+  --color-bg-dark: #191b20;
+  --color-text: white;
+  --color-gray-900: white;
+  --color-gray-300: white;
+  --color-btn-hover: #ffffff10;
+  --color-bg-side: #191b20;
 }
 
 #app .container {
-    margin: 0 auto;
-    max-width: 1060px;
-    padding: 0 20px;
+  margin: 0 auto;
+  max-width: 1060px;
+  padding-bottom: 60px;
 }
 
 .divider {
-    border-top: 1px solid #ccc;
-    margin: 15px 0;
+  border-top: 1px solid #ccc;
+  margin: 15px 0;
 }
