@@ -1,0 +1,13 @@
+.text-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  resize: none;
+  color: var(--color-text);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.text-input:focus {
+  outline: none;
+}

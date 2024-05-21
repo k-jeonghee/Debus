@@ -1,9 +1,9 @@
-import { createElement, memo } from 'react';
-import { ModalType } from 'src/@types/modal';
+import { memo } from 'react';
+import { ModalParameters, ModalType } from 'src/@types/modal';
 
-const Modal = ({ modal }: { modal: ModalType }) => {
-  const { element, resolve, reject } = modal;
-  return <>{createElement(element.type, { onSubmit: resolve, onAbort: reject })}</>;
+const Modal = ({ modal }: { modal: ModalType<ModalParameters> }) => {
+  const { element: ModalContainer, resolve, reject, actionInfo } = modal;
+  return <ModalContainer onSubmit={resolve} onAbort={reject} actionInfo={actionInfo} />;
 };
 
 export default memo(Modal);
