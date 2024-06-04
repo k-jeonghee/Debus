@@ -32,6 +32,10 @@ const Form = ({
             value: 2,
             message: '2글자 이상 입력해주세요.',
           },
+          maxLength: {
+            value: 20,
+            message: '20자 이내로 입력해주세요.',
+          },
         })}
         autoFocus
       />
