@@ -14,16 +14,16 @@ export const useModal = () => {
   const closeModal = useCallback(() => close(modalId), [modalId, close]);
   const openModal = useCallback(
     <P extends { onSubmit(value: unknown): unknown }>(Component: ComponentType<P>, actionInfo?: ActionInfo) =>
-      new Promise<Parameters<P['onSubmit']>[0]>((resolve, reject) => {
+      new Promise<{ ok: boolean; value?: Parameters<P['onSubmit']>[0]; error?: string }>((resolve) => {
         const modal = {
           element: Component,
           modalId,
           resolve: <T extends {}>(value?: T) => {
-            resolve(value);
+            resolve({ ok: true, value });
             closeModal();
           },
-          reject: (reason?: Error) => {
-            reject(reason);
+          reject: (reason?: string) => {
+            resolve({ ok: false, error: reason });
             closeModal();
           },
           actionInfo: actionInfo && {
