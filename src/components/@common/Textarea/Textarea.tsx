@@ -1,58 +1,51 @@
 import classnames from 'classnames/bind';
-import { ChangeEvent, KeyboardEventHandler, useCallback, useEffect, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { ChangeEvent, TextareaHTMLAttributes, forwardRef, useCallback, useEffect, useState } from 'react';
 import styles from './Textarea.module.css';
 const cx = classnames.bind(styles);
 
-const Textarea = ({
-  name,
-  resize,
-  onEnterSubmit,
-  style,
-}: {
-  name: string;
-  resize: boolean;
-  onEnterSubmit: KeyboardEventHandler<HTMLTextAreaElement>;
-  style?: string[];
-}) => {
-  const [textareaHeight, setTextareaHeight] = useState(17);
-  const {
-    register,
-    formState: { isSubmitSuccessful },
-  } = useFormContext();
+type TextareaProps = CustomProps & TextareaHTMLAttributes<HTMLTextAreaElement>;
 
-  //입력된 글자에 따라 teatarea height 조정
-  const resizeTextareaHeight = useCallback(
-    (value: string) => {
-      const lineHeight = 17;
-      const totalTextHeight = value.split('\n').length * lineHeight;
-      const newHeight = totalTextHeight < lineHeight ? textareaHeight : totalTextHeight;
-      setTextareaHeight(newHeight);
-    },
-    [textareaHeight],
-  );
-
-  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    if (resize) resizeTextareaHeight(e.target.value);
-  };
-
-  useEffect(() => {
-    if (isSubmitSuccessful) setTextareaHeight(17);
-  }, [isSubmitSuccessful]);
-
-  return (
-    <textarea
-      className={cx(style && style)}
-      style={{ height: textareaHeight }}
-      rows={1}
-      {...register(name, {
-        onChange: handleChange,
-      })}
-      onKeyDown={onEnterSubmit}
-      placeholder="내용을 입력해주세요"
-      autoFocus
-    />
-  );
+type CustomProps = {
+  resize?: boolean;
+  height?: number;
 };
+
+const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ resize = false, height = 17, className, onChange, value, ...props }: TextareaProps, ref) => {
+    const [textareaHeight, setTextareaHeight] = useState(height);
+
+    const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+      if (resize) resizeTextareaHeight(e.target.value);
+      if (onChange) onChange(e);
+    };
+
+    const resizeTextareaHeight = useCallback(
+      (value: string) => {
+        const lineHeight = height;
+        const totalTextHeight = value.split('\n').length * lineHeight;
+        const newHeight = totalTextHeight < lineHeight ? textareaHeight : totalTextHeight;
+        setTextareaHeight(newHeight);
+      },
+      [height, textareaHeight],
+    );
+
+    useEffect(() => {
+      if (!value) setTextareaHeight(height);
+    }, [value, height]);
+
+    return (
+      <textarea
+        ref={ref}
+        className={cx(`${className}`)}
+        style={{ height: textareaHeight }}
+        value={value}
+        onChange={onChange && handleChange}
+        {...props}
+      />
+    );
+  },
+);
+
+Textarea.displayName = 'Textarea';
 
 export default Textarea;
