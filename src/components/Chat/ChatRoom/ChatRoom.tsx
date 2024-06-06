@@ -1,47 +1,58 @@
 import UpdateNickName from '@components/@common/Modal/ModalContents/UpdateNickName/UpdateNickName';
+import { useChatRoomById } from '@hooks/services/queries/chat';
 import { useModal } from '@hooks/useModal';
 import { baseAuthAtom } from '@store/atoms/auth';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
-import { useNavigate } from 'react-router-dom';
-import { ChatRoomInfoType } from 'src/@types/chat';
+import { memo } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { bindUserAndChatRoom, checkUserInChatRoom, login } from 'src/api/firebase';
+import { useToast } from 'src/context/ToastContext';
 import { assert } from 'src/utils/assert';
 import styles from './ChatRoom.module.css';
 const cx = classnames.bind(styles);
 
-const ChatRoom = ({ chatRoom }: { chatRoom: ChatRoomInfoType }) => {
-  const { id: chatRoomId, title, desc, options, members, status } = chatRoom;
+const ChatRoom = ({ chatRoomId }: { chatRoomId: string }) => {
+  //chatRoomId를 받아와서 데이터를 받아오도록 변경
+  const chatRoom = useChatRoomById(chatRoomId);
+  const { id, title, desc, options, members, status } = chatRoom;
   const user = useAtomValue(baseAuthAtom);
   const { openModal, ModalContainer } = useModal();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleClick = async () => {
     if (!user) {
       try {
         await login();
       } catch (err) {
-        console.log('로그인 실패');
+        toast.add({ type: 'failure', message: '로그인에 실패했어요' });
       }
     }
     assert(user !== null, '사용자 정보가 없습니다.');
     try {
-      const joined = await checkUserInChatRoom(user, chatRoomId);
+      const joined = await checkUserInChatRoom(user, id);
       if (!joined) {
         if (members.length === 4) return confirm('채팅방에 빈자리가 없어요.🥲');
-        const { nickName } = await openModal(UpdateNickName);
-        await bindUserAndChatRoom(user.uid, chatRoomId, nickName);
+        const nickName = await openModal(UpdateNickName);
+        if (!nickName.ok) return;
+        await bindUserAndChatRoom(user.id, id, nickName.value!.nickName);
       }
-      navigate(`/lines/${chatRoomId}`);
+      navigate(`/lines/${id}`);
     } catch {
-      console.log('채팅방에 입장할 수 없습니다.');
+      toast.add({ type: 'failure', message: '채팅방 입장에 실패했어요.' });
     }
   };
+
+  //마지막 참여자가 나가서 채팅방이 삭제되었을 때의 에러 처리
+  if (!chatRoom.members) {
+    return <Navigate to={'/'} />;
+  }
 
   return (
     <li className={cx('container')} onClick={handleClick}>
       <div>
-        <h2 className={cx('id')}>No. {[...chatRoomId].slice(1, 6)}</h2>
+        <h2 className={cx('id')}>No. {[...id].slice(1, 6)}</h2>
         <strong className={cx('title')}>{title}</strong>
         <p className={cx('desc')}>{desc}</p>
         {options.length > 1 && (
@@ -65,4 +76,4 @@ const ChatRoom = ({ chatRoom }: { chatRoom: ChatRoomInfoType }) => {
   );
 };
 
-export default ChatRoom;
+export default memo(ChatRoom);
