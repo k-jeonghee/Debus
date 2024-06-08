@@ -17,6 +17,7 @@ const UpdateNickName = ({ onSubmit, onAbort }: ModalContentProps<Name>) => {
     handleSubmit,
     formState: { errors },
   } = useForm<Name>({ mode: 'onSubmit' });
+
   return (
     <ModalTemplate isOverlay={true}>
       <ModalHeader title={'닉네임 설정'} onClose={onAbort} />
@@ -37,8 +38,8 @@ const UpdateNickName = ({ onSubmit, onAbort }: ModalContentProps<Name>) => {
           />
           <p className={cx('error-msg')}>{errors.nickName?.message}</p>
           <ModalButtonGroup>
-            <Button text="참여하기" variant="accent" type="submit" />
             <Button text="취소" variant="default" onClick={onAbort} />
+            <Button text="참여하기" variant="accent" type="submit" />
           </ModalButtonGroup>
         </form>
       </ModalContent>

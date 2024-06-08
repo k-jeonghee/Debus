@@ -1,19 +1,25 @@
-import { messageQueryOptions } from '@hooks/services/queries/chat';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { messageByIdQueryOptions } from '@hooks/services/queries/chat';
+import { UserTypes } from '@store/atoms/auth';
+import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ChatRoomInfo, Message } from 'src/@types/chat';
 import { addNewMessage, createChatRoom } from 'src/api/firebase';
 
-export const useCreateChatRoom = ({ onSuccess }: { onSuccess: (chatRoomId: string) => void }) =>
+export type createChatRoomMutateType = { user: UserTypes; chatRoomInfo: ChatRoomInfo; nickName: string };
+export const useCreateChatRoom = (options?: UseMutationOptions<string, Error, createChatRoomMutateType>) =>
   useMutation({
     mutationFn: createChatRoom,
-    onSuccess,
-    onError: (err) => console.log(err),
+    ...options,
   });
 
-export const useAddMessage = (chatRoomId: string) => {
+export type addMessageMutateType = { chatRoomId: string; message: Omit<Message, 'id' | 'timestamp'> };
+export const useAddMessage = (
+  chatRoomId: string,
+  options: UseMutationOptions<Message, Error, addMessageMutateType>,
+) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: addNewMessage,
-    onSuccess: () => queryClient.invalidateQueries(messageQueryOptions(chatRoomId)),
-    onError: (err) => alert(`${err} 잠시 후 다시 시도해주세요.`),
+    onSuccess: (v: Message) => queryClient.invalidateQueries(messageByIdQueryOptions(chatRoomId, v.id)),
+    ...options,
   });
 };

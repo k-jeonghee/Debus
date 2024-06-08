@@ -24,7 +24,11 @@ const ChatMessage = ({ message, chatRoomId, isMyMessage }: PropsType) => {
       <div className={cx('info')}>
         <strong className={cx('user-name')}>{message.user.name}</strong>
         <div className={cx('content')}>
-          {file ? <img className={cx('file-img')} src={file} alt="이미지" /> : <p className={cx('text')}>{content}</p>}
+          {file ? (
+            <img className={cx('file-img')} src={file} alt="이미지" />
+          ) : (
+            <pre className={cx('text')}>{content}</pre>
+          )}
           <span className={cx('timestamp')}>{timeAgo}</span>
         </div>
       </div>

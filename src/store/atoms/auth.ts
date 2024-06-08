@@ -1,21 +1,19 @@
 import { atom } from 'jotai';
+import { chatUserInfo } from 'src/@types/chat';
 import { onUserStateChange } from 'src/api/firebase';
 
-export interface BaseUser {
-  uid: string;
+export type UserTypes = {
+  id: string;
   displayName: string | null;
   photoURL: string | null;
   email: string | null;
-}
+  chatRooms: chatUserInfo[];
+};
 
-export interface UserTypes extends BaseUser {
-  chatRooms: { id: string; nickName: string }[];
-}
-
-export const baseAuthAtom = atom<BaseUser | null>(null);
-export const authAtom = atom<Promise<BaseUser>>((get) => {
+export const baseAuthAtom = atom<UserTypes | null>(null);
+export const authAtom = atom<Promise<UserTypes>>((get) => {
   const x = get(baseAuthAtom);
-  if (!x) return new Promise(() => {});
+  if (x === null) return new Promise(() => {});
   return Promise.resolve(x);
 });
 baseAuthAtom.onMount = (set) => onUserStateChange(set);

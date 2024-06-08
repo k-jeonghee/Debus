@@ -10,30 +10,28 @@ import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChatRoomInfoType } from 'src/@types/chat';
 import { exitChatRoom } from 'src/api/firebase';
+import { useToast } from 'src/context/ToastContext';
 import styles from './SidePanel.module.css';
 const cx = classnames.bind(styles);
 
 const SidePanel = ({ chatRoom }: { chatRoom: ChatRoomInfoType }) => {
-  const { uid } = useAtomValue(authAtom);
+  const { id: uid } = useAtomValue(authAtom);
   const { openModal, ModalContainer } = useModal();
+  const toast = useToast();
   const navigate = useNavigate();
 
   const handleClick = async () => {
+    const result = await openModal(ActionModal, {
+      type: 'exit',
+      message: '채팅방에서 나가면 기록을 복구할 수 없어요.',
+    });
+    if (!result.ok) return;
+    const curMembersCount = chatRoom.members.length;
     try {
-      const res = await openModal(ActionModal, { type: 'exit', message: '채팅방에서 나가면 기록을 복구할 수 없어요.' });
-      if (res) {
-        const curMembersCount = chatRoom.members.length;
-        try {
-          await exitChatRoom(uid, chatRoom.id, curMembersCount === 1);
-          navigate(`/`);
-        } catch (err) {
-          //삭제 실패
-          console.log(err);
-        }
-      }
+      await exitChatRoom(uid, chatRoom.id, curMembersCount === 1);
+      navigate('/');
     } catch (err) {
-      //사용자가 직접 모달을 닫음
-      console.log(err);
+      toast.add({ type: 'failure', message: '잠시 후 다시 시도해주세요.' });
     }
   };
 
