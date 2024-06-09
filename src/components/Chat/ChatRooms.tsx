@@ -3,7 +3,7 @@ import CreateChatRoomModal from '@components/@common/Modal/ModalContents/CreateC
 import UpdateNickName from '@components/@common/Modal/ModalContents/UpdateNickName/UpdateNickName';
 import ChatRoom from '@components/Chat/ChatRoom/ChatRoom';
 import { useCreateChatRoom } from '@hooks/services/mutations/chat';
-import { useChatRoom } from '@hooks/services/queries/chat';
+import { chatRoomQueryOptions } from '@hooks/services/queries/chat';
 import { useModal } from '@hooks/useModal';
 import { baseAuthAtom } from '@store/atoms/auth';
 import classnames from 'classnames/bind';
@@ -12,6 +12,7 @@ import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from 'src/api/firebase';
 
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useToast } from 'src/context/ToastContext';
 import styles from './ChatRooms.module.css';
 const cx = classnames.bind(styles);
@@ -22,7 +23,7 @@ const ChatRooms = () => {
   const { openModal: chatRoomModal, ModalContainer: ChatRoomModalContainer } = useModal();
   const { openModal: nickNameModal, ModalContainer: NickNameModalContainer } = useModal();
   const toast = useToast();
-  const chatRooms = useChatRoom();
+  const { data: chatRooms } = useSuspenseQuery({ ...chatRoomQueryOptions() });
   const { mutate } = useCreateChatRoom({
     onSuccess: (chatRoomId: string) => {
       toast.add({ type: 'success', message: '채팅방이 생성되었어요' });
