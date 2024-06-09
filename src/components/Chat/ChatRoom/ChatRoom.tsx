@@ -1,7 +1,8 @@
 import UpdateNickName from '@components/@common/Modal/ModalContents/UpdateNickName/UpdateNickName';
-import { useChatRoomById } from '@hooks/services/queries/chat';
+import { chatRoomByIdQueryOptions } from '@hooks/services/queries/chat';
 import { useModal } from '@hooks/useModal';
 import { baseAuthAtom } from '@store/atoms/auth';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { memo } from 'react';
@@ -14,7 +15,7 @@ const cx = classnames.bind(styles);
 
 const ChatRoom = ({ chatRoomId }: { chatRoomId: string }) => {
   //chatRoomId를 받아와서 데이터를 받아오도록 변경
-  const chatRoom = useChatRoomById(chatRoomId);
+  const { data: chatRoom } = useSuspenseQuery({ ...chatRoomByIdQueryOptions(chatRoomId) });
   const { id, title, desc, options, members, status } = chatRoom;
   const user = useAtomValue(baseAuthAtom);
   const { openModal, ModalContainer } = useModal();

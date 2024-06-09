@@ -2,9 +2,9 @@ import ChatForm from '@components/Chat/ChatPanel/ChatForm/ChatForm';
 import ChatMessage from '@components/Chat/ChatPanel/ChatMessage/ChatMessage';
 
 import Loading from '@components/@common/Loading/Loading';
-import { messageQueryOptions, useChatRoomById, useMessage } from '@hooks/services/queries/chat';
+import { chatRoomByIdQueryOptions, messageQueryOptions } from '@hooks/services/queries/chat';
 import { authAtom } from '@store/atoms/auth';
-import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { Suspense, memo, useEffect } from 'react';
@@ -15,21 +15,15 @@ const cx = classnames.bind(styles);
 
 const ChatPanel = ({ chatRoomId }: { chatRoomId: string }) => {
   const { id: uid } = useAtomValue(authAtom);
-  const { members } = useChatRoomById(chatRoomId);
-  const messages = useMessage(chatRoomId);
+  const { data } = useSuspenseQuery({ ...chatRoomByIdQueryOptions(chatRoomId) });
+  const { members } = data;
+  const { data: messages } = useSuspenseQuery({ ...messageQueryOptions(chatRoomId) });
   //접속한 채팅방 멤버 중 로그인 사용자의 정보
   const memberInfo = members && members.find((member) => member.userId === uid);
 
   const queryClient = useQueryClient();
   useEffect(
-    () =>
-      addMessageListener(chatRoomId, () =>
-        queryClient.refetchQueries(
-          messageQueryOptions(chatRoomId, {
-            placeholderData: keepPreviousData,
-          }),
-        ),
-      ),
+    () => addMessageListener(chatRoomId, () => queryClient.refetchQueries({ ...messageQueryOptions(chatRoomId) })),
     [chatRoomId, queryClient],
   );
 

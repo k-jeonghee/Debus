@@ -1,8 +1,10 @@
-import { BaseUser, UserTypes } from '@store/atoms/auth';
+import { createChatRoomMutateType } from '@hooks/services/mutations/chat';
+import { UserTypes } from '@store/atoms/auth';
 import { MutationFunction } from '@tanstack/react-query';
 import { initializeApp } from 'firebase/app';
 import { GoogleAuthProvider, User, getAuth, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
 import {
+  DataSnapshot,
   child,
   get,
   getDatabase,
@@ -18,7 +20,7 @@ import {
 } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
 
-import { ChatRoomInfo, ChatRoomInfoType, Message } from 'src/@types/chat';
+import { ChatRoomInfoType, Message, chatUserInfo } from 'src/@types/chat';
 import { assert } from 'src/utils/assert';
 
 const firebaseConfig = {
@@ -36,32 +38,31 @@ export const storage = getStorage(app);
 
 const provider = new GoogleAuthProvider();
 
+const userRef = ref(db, 'users');
+const chatRoomRef = ref(db, 'lines');
+const messagesRef = ref(db, 'messages');
+
+//>>>>>>>>>>>>>>>>>>>인증
 export const login = async () => {
   const res = await signInWithPopup(auth, provider);
   const user = res.user;
-  const isRegistered = await checkUserExists(user.uid);
-  if (!isRegistered) await createUser(user);
+  //boolean 타입은 UserTypes에 할당할 수 없음
+  const userOrNull: UserTypes | null = await getUserById(user.uid);
+  if (!userOrNull) await createUser(user);
 };
 
 export const logout = () => signOut(auth);
 
-const userRef = ref(db, 'users');
-export const onUserStateChange = (callback: (user: BaseUser | null) => void) => {
+export const onUserStateChange = (callback: (user: UserTypes | null) => void) => {
   onAuthStateChanged(auth, async (user) => {
-    callback(
-      user && {
-        uid: user.uid,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        email: user.email,
-      },
-    );
+    const updatedUser: UserTypes | null = user ? await getUserById(user.uid) : null;
+    callback(updatedUser);
   });
 };
 
-const checkUserExists = async (userId: string) => {
+const getUserById = async (userId: string) => {
   const snapshot = await get(child(userRef, userId));
-  return snapshot.exists();
+  return snapshot.exists() ? snapshot.val() : null;
 };
 
 const createUser = async (user: User) => {
@@ -75,10 +76,20 @@ const createUser = async (user: User) => {
   });
 };
 
-//User - chatRooms: 참여한 채팅방 정보 추가
+/**
+firebase auth 인스턴스 초기화 시 null 할당 문제로 ProtectdRoute를 위함
+ */
+export const loader = async () => {
+  await auth.authStateReady();
+  return auth.currentUser;
+};
+//<<<<<<<<<<<<<<<<<<<인증
+
+//User: 참여한 채팅방 추가
 const addChatRoomInfoToUser = async (userId: string, chatRoomId: string, nickName: string) => {
   const snapshot = await get(child(userRef, userId));
   const userInfo: UserTypes = snapshot.val();
+
   const chatRoomInfo = {
     id: chatRoomId,
     nickName,
@@ -90,7 +101,7 @@ const addChatRoomInfoToUser = async (userId: string, chatRoomId: string, nickNam
   await update(child(userRef, userId), newUserInfo);
 };
 
-//ChatRoom - members: 사용자 정보 추가
+//ChatRoom: 참여한 사용자 추가
 const addUserIdToChatRoom = async (userId: string, chatRoomId: string, nickName: string) => {
   const snapshot = await get(child(chatRoomRef, chatRoomId));
   const chatRoomInfo: ChatRoomInfoType = snapshot.val();
@@ -103,8 +114,8 @@ const addUserIdToChatRoom = async (userId: string, chatRoomId: string, nickName:
 };
 
 //채팅방 입장 확인
-export const checkUserInChatRoom = async (user: BaseUser, chatRoomId: string) => {
-  const snapshot = await get(child(userRef, `/${user.uid}/chatRooms`));
+export const checkUserInChatRoom = async (user: UserTypes, chatRoomId: string) => {
+  const snapshot = await get(child(userRef, `/${user.id}/chatRooms`));
   //참여중인 채팅방이 1개 이상
   if (snapshot.exists()) {
     const userChatRoom: { id: string; nickName: string }[] = Object.values(snapshot.val());
@@ -119,15 +130,15 @@ export const checkUserInChatRoom = async (user: BaseUser, chatRoomId: string) =>
 
 export const bindUserAndChatRoom = async (userId: string, chatRoomId: string, nickName: string) => {
   //새로운 채팅방이면 양방향 저장
-  addChatRoomInfoToUser(userId, chatRoomId, nickName);
-  addUserIdToChatRoom(userId, chatRoomId, nickName);
+  await addChatRoomInfoToUser(userId, chatRoomId, nickName);
+  await addUserIdToChatRoom(userId, chatRoomId, nickName);
 };
 
-const chatRoomRef = ref(db, 'lines');
-export const createChatRoom: MutationFunction<
-  string,
-  { user: BaseUser; chatRoomInfo: ChatRoomInfo; nickName: string }
-> = async ({ user, chatRoomInfo, nickName }) => {
+export const createChatRoom: MutationFunction<string, createChatRoomMutateType> = async ({
+  user,
+  chatRoomInfo,
+  nickName,
+}) => {
   //chatRoomRef에 참조 추가
   const newChatRoomRef = push(chatRoomRef);
   //추가된 참조의 key값 얻기
@@ -139,7 +150,7 @@ export const createChatRoom: MutationFunction<
     options: chatRoomInfo.options.split(','),
     members: [
       {
-        userId: user.uid,
+        userId: user.id,
         name: nickName,
         role: 'owner',
       },
@@ -150,7 +161,7 @@ export const createChatRoom: MutationFunction<
   //새로 만들어둔 참조를 부모로 해서 새로운 데이터 추가
   await set(newChatRoomRef, newChatRoom);
   //user정보에 채팅방 id 추가
-  await addChatRoomInfoToUser(user.uid, id, nickName);
+  await addChatRoomInfoToUser(user.id, id, nickName);
   return id;
 };
 
@@ -179,17 +190,20 @@ const deleteUserIdToChatRoom = async (userId: string, chatRoomId: string) => {
 //채팅방 삭제
 const deleteChatRoom = async (chatRoomId: string) => {
   await remove(child(chatRoomRef, chatRoomId));
+  await remove(child(messagesRef, chatRoomId));
 };
 
 //채팅방 나가기
 export const exitChatRoom = async (userId: string, chatRoomId: string, isLastMember?: boolean) => {
-  deleteChatRoomInfoToUser(userId, chatRoomId);
-  deleteUserIdToChatRoom(userId, chatRoomId);
+  await deleteChatRoomInfoToUser(userId, chatRoomId);
+  await deleteUserIdToChatRoom(userId, chatRoomId);
+
   if (isLastMember) {
-    setTimeout(() => deleteChatRoom(chatRoomId), 500);
+    await deleteChatRoom(chatRoomId);
   }
 };
 
+//채팅방 참여 멤버 변경
 export const updateMemberListener = (chatRoomId: string, callback: () => void) => {
   const chatRoomMembersRef = child(chatRoomRef, `${chatRoomId}/members`);
   onChildAdded(chatRoomMembersRef, (snapshot) => {
@@ -202,17 +216,30 @@ export const updateMemberListener = (chatRoomId: string, callback: () => void) =
   return () => off(chatRoomMembersRef);
 };
 
+//전체 채팅방 조회
 export const getChatRooms = async (): Promise<ChatRoomInfoType[]> => {
   const snapshot = await get(chatRoomRef);
   return snapshot.exists() ? Object.values(snapshot.val()) : [];
 };
 
+//ID에 맞는 채팅방 조회
 export const getChatRoom = async (id: string): Promise<ChatRoomInfoType> => {
-  const snapshot = await get(child(chatRoomRef, id));
+  const snapshot: DataSnapshot = await get(child(chatRoomRef, id));
   return snapshot.exists() ? snapshot.val() : [];
 };
 
-export const messagesRef = ref(db, 'messages');
+//사용자가 참여중인 채팅방 조회: id만 담은 배열 반환
+export const getChatRoomsByUser = async (userId: string) => {
+  const snapshot = await get(child(userRef, `${userId}/chatRooms`));
+  if (snapshot.exists()) {
+    const origin: chatUserInfo[] = snapshot.val();
+    const userChatRoomIds = origin.map((chatRoom) => chatRoom.id);
+    return userChatRoomIds;
+  }
+  return [];
+};
+
+//메시지 추가
 export const addNewMessage: MutationFunction<
   Message,
   { chatRoomId: string; message: Omit<Message, 'id' | 'timestamp'> }
@@ -229,10 +256,9 @@ export const addNewMessage: MutationFunction<
   await set(newMessageRef, newMessage); // chatRoomId에 해당하는 자식에 메시지 추가
   return newMessage;
 };
-
+//메시지 데이터 변경 리스너
 export const addMessageListener = (chatRoomId: string, callback: () => void) => {
   const chatRoomMessagesRef = child(messagesRef, chatRoomId);
-  // 데이터베이스 변경 사항 관찰
   onChildAdded(chatRoomMessagesRef, (snapshot) => {
     if (snapshot.exists()) callback();
   });
@@ -241,18 +267,14 @@ export const addMessageListener = (chatRoomId: string, callback: () => void) => 
   return () => off(chatRoomMessagesRef);
 };
 
+//채팅방 메시지 조회
 export const getMessages = async (chatRoomId: string): Promise<Message[]> => {
   const snapshot = await get(child(messagesRef, chatRoomId));
   return snapshot.exists() ? Object.values(snapshot.val()) : [];
 };
 
-export const getMessage = async ({
-  chatRoomId,
-  messageId,
-}: {
-  chatRoomId: string;
-  messageId: string;
-}): Promise<Message> => {
+//개별 메시지 조회
+export const getMessage = async (chatRoomId: string, messageId: string): Promise<Message> => {
   const snapshot = await get(child(messagesRef, `${chatRoomId}/${messageId}`));
   return snapshot.val();
 };

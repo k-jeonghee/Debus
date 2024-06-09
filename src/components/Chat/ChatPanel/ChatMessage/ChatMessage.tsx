@@ -1,4 +1,5 @@
-import { useMessageById } from '@hooks/services/queries/chat';
+import { messageByIdQueryOptions } from '@hooks/services/queries/chat';
+import { useQuery } from '@tanstack/react-query';
 import classnames from 'classnames/bind';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -15,7 +16,7 @@ type PropsType = {
 };
 
 const ChatMessage = ({ message, chatRoomId, isMyMessage }: PropsType) => {
-  const { content, file } = useMessageById(chatRoomId, message.id);
+  const { data } = useQuery({ ...messageByIdQueryOptions(chatRoomId, message.id) });
   const timeAgo = format(Number(message.timestamp), 'a HH:mm', { locale: ko });
 
   return (
@@ -24,10 +25,10 @@ const ChatMessage = ({ message, chatRoomId, isMyMessage }: PropsType) => {
       <div className={cx('info')}>
         <strong className={cx('user-name')}>{message.user.name}</strong>
         <div className={cx('content')}>
-          {file ? (
-            <img className={cx('file-img')} src={file} alt="이미지" />
+          {data && data.file ? (
+            <img className={cx('file-img')} src={data.file} alt="이미지" />
           ) : (
-            <pre className={cx('text')}>{content}</pre>
+            <pre className={cx('text')}>{data && data.content}</pre>
           )}
           <span className={cx('timestamp')}>{timeAgo}</span>
         </div>

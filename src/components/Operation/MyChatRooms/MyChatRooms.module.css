@@ -1,0 +1,16 @@
+.container {
+  min-width: 300px;
+  background: var(--color-bg-side);
+  height: calc(100vh - 60px);
+  overflow: auto;
+
+  & h3 {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background: var(--color-bg-side);
+    font-size: 1.1rem;
+    padding: 24px 24px 24px 16px;
+    border-bottom: 1px solid #dddddd;
+  }
+}

@@ -27,9 +27,11 @@ export type Message = {
   content?: string;
   file?: string;
   timestamp: unknown;
-  user: {
-    id: string;
-    name: string;
-  };
+  user: chatUserInfo;
   chatRoomId: string;
+};
+
+export type chatUserInfo = {
+  id: string;
+  name: string;
 };
