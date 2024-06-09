@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 48px;
+}
+
+.content {
+  text-align: center;
+}
+
+.container h1 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #bebebe;
+}
+
+.container .icon {
+  font-size: 4rem;
+  color: #bebebe;
+  margin-bottom: 24px;
+}
