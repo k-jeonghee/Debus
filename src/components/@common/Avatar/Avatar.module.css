@@ -1,9 +1,54 @@
-.wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #eeeeee;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+.btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #eeeeee;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+[data-radix-popper-content-wrapper] {
+  top: 15px !important;
+}
+
+.content {
+  min-width: 100px;
+  background-color: white;
+  border-radius: 6px;
+  padding: 5px;
+  box-shadow:
+    0px 10px 38px -10px #16171859,
+    0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.item {
+  color: #38322d !important;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--violet-11);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  height: 25px;
+  line-height: 25px;
+  padding: 0 12px;
+  margin: 4px 0;
+  user-select: none;
+  outline: none;
+}
+
+.item[data-highlighted] {
+  background: #ffede8;
+  color: #ff6636 !important;
+}
+
+.polygon {
+  color: white;
+  position: absolute;
+  top: -10px;
+  left: 43px;
 }
