@@ -7,7 +7,8 @@ import { authAtom } from '@store/atoms/auth';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
-import { Suspense, memo, useEffect } from 'react';
+import { Suspense, memo, useEffect, useRef } from 'react';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { addMessageListener } from 'src/api/firebase';
 import styles from './ChatPanel.module.css';
 
@@ -21,6 +22,19 @@ const ChatPanel = ({ chatRoomId }: { chatRoomId: string }) => {
     select: (data) => data.members.find((member) => member.userId === uid),
   });
 
+  /**
+   * 새로운 메시지 전송 시 스크롤 위치 이동
+   */
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
+  useEffect(() => {
+    if (virtuosoRef.current) {
+      virtuosoRef.current.scrollToIndex({
+        index: 'LAST',
+        align: 'start',
+      });
+    }
+  }, [messages]);
+
   const queryClient = useQueryClient();
   useEffect(
     () => addMessageListener(chatRoomId, () => queryClient.invalidateQueries(messageQueryOptions(chatRoomId))),
@@ -31,14 +45,18 @@ const ChatPanel = ({ chatRoomId }: { chatRoomId: string }) => {
     <Suspense fallback={<Loading />}>
       <div className={cx('container')}>
         <div className={cx('chat-message-container')}>
-          {messages.map((message) => (
-            <ChatMessage
-              key={message.id}
-              message={message}
-              chatRoomId={chatRoomId}
-              isMyMessage={uid === message.user.id}
-            />
-          ))}
+          <Virtuoso
+            ref={virtuosoRef}
+            data={messages}
+            itemContent={(_, message) => (
+              <ChatMessage
+                key={message.id}
+                message={message}
+                chatRoomId={chatRoomId}
+                isMyMessage={uid === message.user.id}
+              />
+            )}
+          />
         </div>
         {memberInfo && <ChatForm nickName={memberInfo.name} chatRoomId={chatRoomId} />}
       </div>
