@@ -1,12 +1,13 @@
 import Textarea from '@components/@common/Textarea/Textarea';
 import { useAddMessage } from '@hooks/services/mutations/chat';
+import { BiPaperPlane } from '@react-icons/all-files/bi/BiPaperPlane';
+import { BsFillPlusCircleFill } from '@react-icons/all-files/bs/BsFillPlusCircleFill';
 import { authAtom } from '@store/atoms/auth';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { ChangeEvent, KeyboardEventHandler, memo, useCallback, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { BsPlusCircleFill } from 'react-icons/bs';
-import { PiPaperPlaneTiltFill } from 'react-icons/pi';
+
 import { PuffLoader } from 'react-spinners';
 import { Message } from 'src/@types/chat';
 import { uploadImage } from 'src/api/uploader';
@@ -126,11 +127,11 @@ const ChatForm = ({ nickName, chatRoomId }: { nickName: string; chatRoomId: stri
                     {isLoading ? (
                       <PuffLoader color="#ff6636" loading size={24} />
                     ) : (
-                      <BsPlusCircleFill className={cx({ disabled: isLoading })} />
+                      <BsFillPlusCircleFill className={cx({ disabled: isLoading })} />
                     )}
                   </button>
                   <button type="submit" className={cx('submit-btn', { active: field.value })} disabled={!field.value}>
-                    <PiPaperPlaneTiltFill />
+                    <BiPaperPlane />
                   </button>
                 </div>
               </>

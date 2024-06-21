@@ -1,10 +1,11 @@
 import { Close, Description, Root } from '@radix-ui/react-toast';
-import { GoAlertFill, GoCheckCircleFill } from 'react-icons/go';
+import { GoAlert } from '@react-icons/all-files/go/GoAlert';
+import { GoCheck } from '@react-icons/all-files/go/GoCheck';
 import { ToastType } from 'src/context/ToastContext';
 
 const toastType = {
-  success: <GoCheckCircleFill />,
-  failure: <GoAlertFill />,
+  success: <GoCheck />,
+  failure: <GoAlert />,
 };
 
 const Toast = ({ id, type, message, duration, onRemove }: ToastType & { onRemove: (toastId: string) => void }) => {
