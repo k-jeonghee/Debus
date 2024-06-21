@@ -23,11 +23,9 @@ const ChatRoom = ({ chatRoomId }: { chatRoomId: string }) => {
 
   const handleClick = async () => {
     if (!user) {
-      try {
-        await login();
-      } catch (err) {
-        toast.add({ type: 'failure', message: '로그인에 실패했어요' });
-      }
+      await login();
+      navigate('/');
+      return;
     }
     assert(user !== null, '사용자 정보가 없습니다.');
     try {
