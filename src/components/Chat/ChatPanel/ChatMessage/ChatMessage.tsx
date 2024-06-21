@@ -16,7 +16,7 @@ type PropsType = {
 };
 
 const ChatMessage = ({ message, chatRoomId, isMyMessage }: PropsType) => {
-  const { data } = useQuery({ ...messageByIdQueryOptions(chatRoomId, message.id) });
+  const { data } = useQuery(messageByIdQueryOptions(chatRoomId, message.id));
   const timeAgo = format(Number(message.timestamp), 'a HH:mm', { locale: ko });
 
   return (

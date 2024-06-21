@@ -23,7 +23,7 @@ const ChatRooms = () => {
   const { openModal: chatRoomModal, ModalContainer: ChatRoomModalContainer } = useModal();
   const { openModal: nickNameModal, ModalContainer: NickNameModalContainer } = useModal();
   const toast = useToast();
-  const { data: chatRooms } = useSuspenseQuery({ ...chatRoomQueryOptions() });
+  const { data: chatRooms } = useSuspenseQuery(chatRoomQueryOptions());
   const { mutate } = useCreateChatRoom({
     onSuccess: (chatRoomId: string) => {
       toast.add({ type: 'success', message: '채팅방이 생성되었어요' });

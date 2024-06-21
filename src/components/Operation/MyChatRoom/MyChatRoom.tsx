@@ -9,8 +9,8 @@ import styles from './MyChatRoom.module.css';
 const cx = classnames.bind(styles);
 
 const MyChatRoom = ({ chatRoomId }: { chatRoomId: string }) => {
-  const { data: chatRoom } = useSuspenseQuery({ ...chatRoomByIdQueryOptions(chatRoomId) });
-  const { data: messages } = useSuspenseQuery({ ...messageQueryOptions(chatRoomId) });
+  const { data: chatRoom } = useSuspenseQuery(chatRoomByIdQueryOptions(chatRoomId));
+  const { data: messages } = useSuspenseQuery(messageQueryOptions(chatRoomId));
   const setCurChatRoomId = useSetAtom(currentChatRoom);
   const { title, members } = chatRoom;
   const lastMessage = messages.length !== 0 && messages[messages.length - 1];

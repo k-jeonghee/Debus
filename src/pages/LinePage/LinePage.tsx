@@ -15,7 +15,7 @@ const cx = classnames.bind(styles);
 const LinePage = () => {
   const { id: chatRoomId } = useParams();
   assert(chatRoomId !== undefined, '채팅방 id가 존재하지 않습니다.');
-  const { data: chatRoom } = useSuspenseQuery({ ...chatRoomByIdQueryOptions(chatRoomId) });
+  const { data: chatRoom } = useSuspenseQuery(chatRoomByIdQueryOptions(chatRoomId));
   const queryClient = useQueryClient();
 
   useEffect(() => {

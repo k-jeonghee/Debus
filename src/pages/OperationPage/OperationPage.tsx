@@ -18,7 +18,7 @@ const OperationPage = () => {
   const { userId } = useParams();
   assert(userId !== undefined, '사용자 ID를 찾을 수 없어요.');
   const [curChatRoomId, setCurChatRoomId] = useAtom(currentChatRoom);
-  const { data: chatRoomIds } = useSuspenseQuery({ ...chatRoomsByUserQueryOptions(userId) });
+  const { data: chatRoomIds } = useSuspenseQuery(chatRoomsByUserQueryOptions(userId));
 
   useEffect(() => setCurChatRoomId(''), [setCurChatRoomId]);
 

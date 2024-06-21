@@ -15,15 +15,15 @@ const cx = classnames.bind(styles);
 
 const ChatPanel = ({ chatRoomId }: { chatRoomId: string }) => {
   const { id: uid } = useAtomValue(authAtom);
-  const { data } = useSuspenseQuery({ ...chatRoomByIdQueryOptions(chatRoomId) });
-  const { members } = data;
-  const { data: messages } = useSuspenseQuery({ ...messageQueryOptions(chatRoomId) });
-  //접속한 채팅방 멤버 중 로그인 사용자의 정보
-  const memberInfo = members && members.find((member) => member.userId === uid);
+  const { data: messages } = useSuspenseQuery(messageQueryOptions(chatRoomId));
+  const { data: memberInfo } = useSuspenseQuery({
+    ...chatRoomByIdQueryOptions(chatRoomId),
+    select: (data) => data.members.find((member) => member.userId === uid),
+  });
 
   const queryClient = useQueryClient();
   useEffect(
-    () => addMessageListener(chatRoomId, () => queryClient.refetchQueries({ ...messageQueryOptions(chatRoomId) })),
+    () => addMessageListener(chatRoomId, () => queryClient.invalidateQueries(messageQueryOptions(chatRoomId))),
     [chatRoomId, queryClient],
   );
 

@@ -14,8 +14,7 @@ import styles from './ChatRoom.module.css';
 const cx = classnames.bind(styles);
 
 const ChatRoom = ({ chatRoomId }: { chatRoomId: string }) => {
-  //chatRoomId를 받아와서 데이터를 받아오도록 변경
-  const { data: chatRoom } = useSuspenseQuery({ ...chatRoomByIdQueryOptions(chatRoomId) });
+  const { data: chatRoom } = useSuspenseQuery(chatRoomByIdQueryOptions(chatRoomId));
   const { id, title, desc, options, members, status } = chatRoom;
   const user = useAtomValue(baseAuthAtom);
   const { openModal, ModalContainer } = useModal();
