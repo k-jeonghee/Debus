@@ -31,7 +31,7 @@ export const router = createBrowserRouter([
         path: '/stations',
         element: (
           <Suspense fallback={<Loading />}>
-            <StationPage />,
+            <StationPage />
           </Suspense>
         ),
       },
@@ -47,7 +47,7 @@ export const router = createBrowserRouter([
         path: '/my-page',
         element: (
           <Suspense fallback={<Loading />}>
-            <MyPage />,
+            <MyPage />
           </Suspense>
         ),
       },
