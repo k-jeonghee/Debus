@@ -1,9 +1,7 @@
 import Loading from '@components/@common/Loading/Loading';
 import ErrorSupport from '@components/Error/ErrorSupport';
-
 import ProtectedRoute from '@pages/ProtectedRoute/ProtectedRoute';
 import { Suspense, lazy } from 'react';
-
 import { createBrowserRouter } from 'react-router-dom';
 import App from 'src/App';
 import { loader } from 'src/api/firebase';
@@ -46,13 +44,15 @@ export const router = createBrowserRouter([
       {
         path: '/my-page',
         element: (
-          <Suspense fallback={<Loading />}>
-            <MyPage />
-          </Suspense>
+          <ProtectedRoute>
+            <Suspense fallback={<Loading />}>
+              <MyPage />
+            </Suspense>
+          </ProtectedRoute>
         ),
       },
       {
-        path: '/my-operation/:userId',
+        path: '/my-operation',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<Loading />}>
