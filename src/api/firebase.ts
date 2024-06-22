@@ -2,7 +2,15 @@ import { createChatRoomMutateType } from '@hooks/services/mutations/chat';
 import { UserInfo, UserTypes } from '@store/atoms/auth';
 import { MutationFunction } from '@tanstack/react-query';
 import { initializeApp } from 'firebase/app';
-import { GoogleAuthProvider, User, getAuth, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import {
+  GoogleAuthProvider,
+  User,
+  deleteUser,
+  getAuth,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+} from 'firebase/auth';
 import {
   DataSnapshot,
   child,
@@ -100,6 +108,24 @@ export const loader = async () => {
   return auth.currentUser;
 };
 //<<<<<<<<<<<<<<<<<<<인증
+
+//회원탈퇴
+export const deleteUserFromGoogle = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    try {
+      await deleteUserFromDB(user.uid);
+      await deleteUser(user);
+      logout();
+    } catch (error) {
+      throw new Error('회원탈퇴 실패!');
+    }
+  }
+};
+
+const deleteUserFromDB = async (uid: string) => {
+  await remove(child(userRef, uid));
+};
 
 //User: 참여한 채팅방 추가
 const addChatRoomInfoToUser = async (userId: string, chatRoomId: string, nickName: string) => {

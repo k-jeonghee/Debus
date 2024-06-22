@@ -1,12 +1,14 @@
 import Button from '@components/@common/Button/Button';
+import DeleteUser from '@components/@common/Modal/ModalContents/DeleteUser/DeleteUser';
 import { userInfoQueryOptions } from '@hooks/services/queries/user';
+import { useModal } from '@hooks/useModal';
 import { UserInfo, authAtom } from '@store/atoms/auth';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { updateUserInfo } from 'src/api/firebase';
+import { deleteUserFromGoogle, updateUserInfo } from 'src/api/firebase';
 import { useToast } from 'src/context/ToastContext';
 import styles from './MyPage.module.css';
 const cx = classnames.bind(styles);
@@ -17,14 +19,15 @@ const MyPage = () => {
   const { register, handleSubmit, reset, setValue } = useForm<UserInfo>();
   const {
     data: { nickname, sns, options },
-  } = useSuspenseQuery({ ...userInfoQueryOptions(id) });
+  } = useSuspenseQuery(userInfoQueryOptions(id));
   const toast = useToast();
+  const { openModal, ModalContainer } = useModal();
 
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: updateUserInfo,
     onSuccess: () => {
-      queryClient.invalidateQueries({ ...userInfoQueryOptions(id) });
+      queryClient.invalidateQueries(userInfoQueryOptions(id));
       toast.add({ type: 'success', message: '변경사항이 저장되었어요.' });
       setIsEdit(false);
     },
@@ -43,6 +46,18 @@ const MyPage = () => {
   const handleEdit: SubmitHandler<UserInfo> = (data) => {
     mutate({ userId: id, newInfo: { ...data } });
     reset();
+  };
+
+  const handleDelete = async () => {
+    const response = await openModal(DeleteUser);
+    if (response.ok) {
+      try {
+        await deleteUserFromGoogle();
+        toast.add({ type: 'success', message: '회원탈퇴가 완료되었어요🥲' });
+      } catch (error) {
+        toast.add({ type: 'failure', message: '회원탈퇴에 실패했어요. 잠시 후 다시 시도해주세요.' });
+      }
+    }
   };
 
   return (
@@ -81,8 +96,9 @@ const MyPage = () => {
         </form>
       </div>
       <div className={cx('delete')}>
-        <Button text="회원탈퇴" variant="accent" name="delete-account" />
+        <Button text="회원탈퇴" variant="accent" onClick={handleDelete} name="delete-account" />
       </div>
+      <ModalContainer />
     </div>
   );
 };
