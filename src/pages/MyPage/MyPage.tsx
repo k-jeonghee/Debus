@@ -22,6 +22,7 @@ const MyPage = () => {
   } = useSuspenseQuery(userInfoQueryOptions(id));
   const toast = useToast();
   const { openModal, ModalContainer } = useModal();
+  const optionsString = options && (options as string[]).join(',');
 
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
@@ -35,13 +36,13 @@ const MyPage = () => {
   });
 
   /**
-   * 정보 변경 직후 다시 수정 모드 진입 시 변경된 상태로 보여주기 위함
+   * input value에 데이터 보여주기 위함
    */
   useEffect(() => {
     setValue('nickname', nickname);
     setValue('sns', sns);
-    setValue('options', options);
-  }, [setValue, nickname, sns, options]);
+    setValue('options', optionsString);
+  }, [setValue, nickname, sns, optionsString]);
 
   const handleEdit: SubmitHandler<UserInfo> = (data) => {
     mutate({ userId: id, newInfo: { ...data } });
@@ -81,7 +82,7 @@ const MyPage = () => {
           {!isEdit ? <p>{nickname ? nickname : '-'}</p> : <input id="nickname" type="text" {...register('nickname')} />}
           <label htmlFor="options">정보</label>
           {!isEdit ? (
-            <p>{options ? (options as string[]).join(', ') : '-'}</p>
+            <p>{optionsString ? optionsString : '-'}</p>
           ) : (
             <input id="options" type="text" {...register('options')} />
           )}
