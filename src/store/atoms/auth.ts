@@ -4,10 +4,16 @@ import { onUserStateChange } from 'src/api/firebase';
 
 export type UserTypes = {
   id: string;
-  displayName: string | null;
+  name: string | null;
   photoURL: string | null;
   email: string | null;
   chatRooms: chatUserInfo[];
+} & UserInfo;
+
+export type UserInfo = {
+  nickname: string;
+  options: string;
+  sns: string;
 };
 
 export const baseAuthAtom = atom<UserTypes | null>(null);

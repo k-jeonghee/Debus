@@ -1,5 +1,5 @@
 import { createChatRoomMutateType } from '@hooks/services/mutations/chat';
-import { UserTypes } from '@store/atoms/auth';
+import { UserInfo, UserTypes } from '@store/atoms/auth';
 import { MutationFunction } from '@tanstack/react-query';
 import { initializeApp } from 'firebase/app';
 import { GoogleAuthProvider, User, getAuth, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
@@ -60,7 +60,7 @@ export const onUserStateChange = (callback: (user: UserTypes | null) => void) =>
   });
 };
 
-const getUserById = async (userId: string) => {
+export const getUserById = async (userId: string) => {
   const snapshot = await get(child(userRef, userId));
   return snapshot.exists() ? snapshot.val() : null;
 };
@@ -74,6 +74,22 @@ const createUser = async (user: User) => {
     photoURL: user.photoURL,
     chatRooms: [],
   });
+};
+
+//사용자 정보 추가
+type UserInfoMutateType = {
+  userId: string;
+  newInfo: UserInfo;
+};
+export const updateUserInfo: MutationFunction<void, UserInfoMutateType> = async ({ userId, newInfo }) => {
+  const snapshot = await get(child(userRef, userId));
+  const userInfo: UserTypes = snapshot.val();
+  const newUserInfo = {
+    ...userInfo,
+    ...newInfo,
+    options: newInfo.options.split(','),
+  };
+  await update(child(userRef, userId), newUserInfo);
 };
 
 /**
@@ -256,6 +272,7 @@ export const addNewMessage: MutationFunction<
   await set(newMessageRef, newMessage); // chatRoomId에 해당하는 자식에 메시지 추가
   return newMessage;
 };
+
 //메시지 데이터 변경 리스너
 export const addMessageListener = (chatRoomId: string, callback: () => void) => {
   const chatRoomMessagesRef = child(messagesRef, chatRoomId);
