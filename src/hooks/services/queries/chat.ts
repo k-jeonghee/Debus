@@ -31,12 +31,12 @@ export const messageQueryOptions = (chatRoomId: string) =>
   queryOptions({
     queryKey: chatKeys.messages(chatRoomId),
     queryFn: () => getMessages(chatRoomId),
-    // placeholderData: keepPreviousData,
+    staleTime: 200000,
   });
 
-export const messageByIdQueryOptions = (chatRoomId: string, messageId: string) =>
-  queryOptions({
+export const messageByIdQueryOptions = (chatRoomId: string, messageId: string) => {
+  return queryOptions({
     queryKey: chatKeys.messageById(chatRoomId, messageId),
     queryFn: () => getMessage(chatRoomId, messageId),
-    staleTime: 60 * 1000,
   });
+};

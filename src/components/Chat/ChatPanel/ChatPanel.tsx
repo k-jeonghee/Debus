@@ -2,13 +2,14 @@ import ChatForm from '@components/Chat/ChatPanel/ChatForm/ChatForm';
 import ChatMessage from '@components/Chat/ChatPanel/ChatMessage/ChatMessage';
 
 import Loading from '@components/@common/Loading/Loading';
-import { chatRoomByIdQueryOptions, messageQueryOptions } from '@hooks/services/queries/chat';
+import { chatKeys, chatRoomByIdQueryOptions, messageQueryOptions } from '@hooks/services/queries/chat';
 import { authAtom } from '@store/atoms/auth';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { Suspense, memo, useEffect, useRef } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { Message } from 'src/@types/chat';
 import { addMessageListener } from 'src/api/firebase';
 import styles from './ChatPanel.module.css';
 
@@ -16,6 +17,7 @@ const cx = classnames.bind(styles);
 
 const ChatPanel = ({ chatRoomId }: { chatRoomId: string }) => {
   const { id: uid } = useAtomValue(authAtom);
+  const queryClient = useQueryClient();
   const { data: messages } = useSuspenseQuery(messageQueryOptions(chatRoomId));
   const { data: memberInfo } = useSuspenseQuery({
     ...chatRoomByIdQueryOptions(chatRoomId),
@@ -27,19 +29,20 @@ const ChatPanel = ({ chatRoomId }: { chatRoomId: string }) => {
    */
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   useEffect(() => {
-    if (virtuosoRef.current) {
-      virtuosoRef.current.scrollToIndex({
-        index: 'LAST',
-        align: 'start',
-      });
-    }
+    virtuosoRef.current!.scrollToIndex({
+      index: messages.length - 1,
+    });
   }, [messages]);
 
-  const queryClient = useQueryClient();
-  useEffect(
-    () => addMessageListener(chatRoomId, () => queryClient.invalidateQueries(messageQueryOptions(chatRoomId))),
-    [chatRoomId, queryClient],
-  );
+  useEffect(() => {
+    const handleMessage = (newMessages: Message[]) => {
+      queryClient.setQueryData(chatKeys.messages(chatRoomId), (): Message[] => {
+        return newMessages ?? [];
+      });
+    };
+
+    return addMessageListener(chatRoomId, handleMessage);
+  }, [chatRoomId, queryClient]);
 
   return (
     <Suspense fallback={<Loading />}>
@@ -49,15 +52,11 @@ const ChatPanel = ({ chatRoomId }: { chatRoomId: string }) => {
             ref={virtuosoRef}
             data={messages}
             itemContent={(_, message) => (
-              <ChatMessage
-                key={message.id}
-                message={message}
-                chatRoomId={chatRoomId}
-                isMyMessage={uid === message.user.id}
-              />
+              <ChatMessage key={message.id} message={message} isMyMessage={uid === message.user.id} />
             )}
           />
         </div>
+
         {memberInfo && <ChatForm nickName={memberInfo.name} chatRoomId={chatRoomId} />}
       </div>
     </Suspense>
