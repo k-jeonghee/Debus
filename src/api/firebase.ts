@@ -19,6 +19,7 @@ import {
   off,
   onChildAdded,
   onChildRemoved,
+  onValue,
   push,
   ref,
   remove,
@@ -54,7 +55,7 @@ const messagesRef = ref(db, 'messages');
 export const login = async () => {
   const res = await signInWithPopup(auth, provider);
   const user = res.user;
-  //boolean 타입은 UserTypes에 할당할 수 없음
+
   const userOrNull: UserTypes | null = await getUserById(user.uid);
   if (!userOrNull) await createUser(user);
   return userOrNull;
@@ -301,10 +302,13 @@ export const addNewMessage: MutationFunction<
 };
 
 //메시지 데이터 변경 리스너
-export const addMessageListener = (chatRoomId: string, callback: () => void) => {
+export const addMessageListener = (chatRoomId: string, callback: (newMessages: Message[]) => void) => {
   const chatRoomMessagesRef = child(messagesRef, chatRoomId);
-  onChildAdded(chatRoomMessagesRef, (snapshot) => {
-    if (snapshot.exists()) callback();
+  onValue(chatRoomMessagesRef, (snapshot) => {
+    if (snapshot.exists()) {
+      const messages: Message[] = snapshot.val();
+      callback(Object.values(messages));
+    }
   });
 
   //리스너 해제
