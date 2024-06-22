@@ -4,7 +4,7 @@ import { baseAuthAtom } from '@store/atoms/auth';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { Link, useNavigate } from 'react-router-dom';
-import { login, logout } from 'src/api/firebase';
+import { login } from 'src/api/firebase';
 import styles from './Header.module.css';
 const cx = classnames.bind(styles);
 
@@ -12,14 +12,11 @@ const Header = () => {
   const user = useAtomValue(baseAuthAtom);
   const navigate = useNavigate();
   const handleLogin = () => {
-    login();
-    navigate('/');
+    login().then(() => {
+      navigate('/');
+    });
   };
 
-  const handleLogOut = () => {
-    logout();
-    navigate('/');
-  };
   return (
     <header id={cx('header')}>
       <div className={cx('header')}>
@@ -29,13 +26,11 @@ const Header = () => {
         <div className={cx('header-right')}>
           <ThemeButton />
           {user && <Avatar />}
-          {user ? (
-            <a onClick={handleLogOut}>
-              <button className={cx('btn-login')}>로그아웃</button>
-            </a>
-          ) : (
-            <a onClick={handleLogin}>
-              <button className={cx('btn-login')}>로그인</button>
+          {!user && (
+            <a href="#" onClick={handleLogin} role="button">
+              <button className={cx('btn-login')} name="login">
+                로그인
+              </button>
             </a>
           )}
         </div>

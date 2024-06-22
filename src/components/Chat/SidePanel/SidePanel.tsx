@@ -41,7 +41,7 @@ const SidePanel = ({ chatRoom }: { chatRoom: ChatRoomInfoType }) => {
         <ChatRoomHeader chatRoom={chatRoom} />
         <ChatMembers members={chatRoom.members} />
       </div>
-      <Button text="나가기" variant="accent" onClick={handleClick} />
+      <Button text="나가기" variant="accent" onClick={handleClick} name="exit-chatRoom" />
       <ModalContainer />
     </div>
   );

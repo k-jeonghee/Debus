@@ -13,8 +13,8 @@ const CreateChatRoomModal = ({ onSubmit, onAbort }: ModalContentProps<ChatRoomIn
       <ModalContent>
         <Form onSubmit={onSubmit}>
           <ModalButtonGroup>
-            <Button text="취소" variant="default" onClick={onAbort} />
-            <Button text="방만들기" variant="accent" type="submit" />
+            <Button text="취소" variant="default" onClick={onAbort} name="cancel" />
+            <Button text="방만들기" variant="accent" type="submit" name="create-chatRoom" />
           </ModalButtonGroup>
         </Form>
       </ModalContent>

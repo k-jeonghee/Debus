@@ -11,11 +11,9 @@ const ThemeButton = () => {
   const [darkMode, toggleDarkMode] = useAtom(darkModeAtom);
 
   return (
-    <>
-      <button className={cx('wrapper')} onClick={toggleDarkMode}>
-        {darkMode ? <IoMdMoon /> : <IoIosSunny />}
-      </button>
-    </>
+    <button className={cx('wrapper')} onClick={toggleDarkMode} name="theme-toggle">
+      {darkMode ? <IoMdMoon /> : <IoIosSunny />}
+    </button>
   );
 };
 

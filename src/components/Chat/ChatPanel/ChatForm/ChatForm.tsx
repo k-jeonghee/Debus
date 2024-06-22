@@ -7,7 +7,6 @@ import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { ChangeEvent, KeyboardEventHandler, memo, useCallback, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-
 import { PuffLoader } from 'react-spinners';
 import { Message } from 'src/@types/chat';
 import { uploadImage } from 'src/api/uploader';
@@ -123,14 +122,19 @@ const ChatForm = ({ nickName, chatRoomId }: { nickName: string; chatRoomId: stri
                   onKeyDown={handleEnterSubmit}
                 />
                 <div className={cx('btn-group')}>
-                  <button className={cx('file-btn')} onClick={handleOpenFile} disabled={isLoading}>
+                  <button className={cx('file-btn')} onClick={handleOpenFile} disabled={isLoading} name="file-uploader">
                     {isLoading ? (
                       <PuffLoader color="#ff6636" loading size={24} />
                     ) : (
                       <BsFillPlusCircleFill className={cx({ disabled: isLoading })} />
                     )}
                   </button>
-                  <button type="submit" className={cx('submit-btn', { active: field.value })} disabled={!field.value}>
+                  <button
+                    type="submit"
+                    className={cx('submit-btn', { active: field.value })}
+                    disabled={!field.value}
+                    name="submit-message"
+                  >
                     <BiPaperPlane />
                   </button>
                 </div>
