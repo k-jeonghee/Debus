@@ -57,6 +57,7 @@ export const login = async () => {
   //boolean 타입은 UserTypes에 할당할 수 없음
   const userOrNull: UserTypes | null = await getUserById(user.uid);
   if (!userOrNull) await createUser(user);
+  return userOrNull;
 };
 
 export const logout = () => signOut(auth);

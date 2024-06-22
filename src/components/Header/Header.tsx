@@ -2,18 +2,19 @@ import Avatar from '@components/@common/Avatar/Avatar';
 import ThemeButton from '@components/@common/ThemeButton/ThemeButton';
 import { baseAuthAtom } from '@store/atoms/auth';
 import classnames from 'classnames/bind';
-import { useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from 'src/api/firebase';
 import styles from './Header.module.css';
 const cx = classnames.bind(styles);
 
 const Header = () => {
-  const user = useAtomValue(baseAuthAtom);
+  const [user, setUser] = useAtom(baseAuthAtom);
   const navigate = useNavigate();
   const handleLogin = () => {
-    login().then(() => {
+    login().then((_user) => {
       navigate('/');
+      if (_user) setUser(_user);
     });
   };
 
@@ -27,11 +28,9 @@ const Header = () => {
           <ThemeButton />
           {user && <Avatar />}
           {!user && (
-            <a href="#" onClick={handleLogin} role="button">
-              <button className={cx('btn-login')} name="login">
-                로그인
-              </button>
-            </a>
+            <button className={cx('btn-login')} name="login" onClick={handleLogin}>
+              로그인
+            </button>
           )}
         </div>
       </div>
