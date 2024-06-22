@@ -26,6 +26,7 @@
 }
 
 .item {
+  width: 100%;
   color: #38322d !important;
   font-size: 13px;
   line-height: 1;
@@ -39,6 +40,10 @@
   margin: 4px 0;
   user-select: none;
   outline: none;
+}
+
+.item button {
+  flex-shrink: 1;
 }
 
 .item[data-highlighted] {

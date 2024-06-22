@@ -31,7 +31,7 @@ const Avatar = () => {
               {user && <Link to={'/my-page'}>마이페이지</Link>}
             </Item>
             <Item className={cx('item')} asChild>
-              <button role="button" onClick={handleLogOut}>
+              <button role="button" onClick={handleLogOut} name="logout">
                 로그아웃
               </button>
             </Item>
