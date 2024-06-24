@@ -63,12 +63,11 @@ export const login = async () => {
 
 export const logout = () => signOut(auth);
 
-export const onUserStateChange = (callback: (user: UserTypes | null) => void) => {
+export const onUserStateChange = (callback: (user: UserTypes | null) => void) =>
   onAuthStateChanged(auth, async (user) => {
     const updatedUser: UserTypes | null = user ? await getUserById(user.uid) : null;
     callback(updatedUser);
   });
-};
 
 export const getUserById = async (userId: string) => {
   const snapshot = await get(child(userRef, userId));
