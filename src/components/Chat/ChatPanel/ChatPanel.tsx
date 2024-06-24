@@ -2,7 +2,7 @@ import ChatForm from '@components/Chat/ChatPanel/ChatForm/ChatForm';
 import ChatMessage from '@components/Chat/ChatPanel/ChatMessage/ChatMessage';
 
 import Loading from '@components/@common/Loading/Loading';
-import { chatKeys, chatRoomByIdQueryOptions, messageQueryOptions } from '@hooks/services/queries/chat';
+import { chatKeys, messageQueryOptions } from '@hooks/services/queries/chat';
 import { authAtom } from '@store/atoms/auth';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import classnames from 'classnames/bind';
@@ -19,10 +19,6 @@ const ChatPanel = ({ chatRoomId }: { chatRoomId: string }) => {
   const { id: uid } = useAtomValue(authAtom);
   const queryClient = useQueryClient();
   const { data: messages } = useSuspenseQuery(messageQueryOptions(chatRoomId));
-  const { data: memberInfo } = useSuspenseQuery({
-    ...chatRoomByIdQueryOptions(chatRoomId),
-    select: (data) => data.members.find((member) => member.userId === uid),
-  });
 
   /**
    * 새로운 메시지 전송 시 스크롤 위치 이동
@@ -56,8 +52,7 @@ const ChatPanel = ({ chatRoomId }: { chatRoomId: string }) => {
             )}
           />
         </div>
-
-        {memberInfo && <ChatForm nickName={memberInfo.name} chatRoomId={chatRoomId} />}
+        {<ChatForm chatRoomId={chatRoomId} />}
       </div>
     </Suspense>
   );

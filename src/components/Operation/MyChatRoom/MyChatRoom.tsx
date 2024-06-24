@@ -1,20 +1,20 @@
 import { chatRoomByIdQueryOptions, messageQueryOptions } from '@hooks/services/queries/chat';
 import { currentChatRoom } from '@store/atoms/chat';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQueries } from '@tanstack/react-query';
 import classnames from 'classnames/bind';
 import { format } from 'date-fns';
 import { useSetAtom } from 'jotai';
-import { useMemo, useTransition } from 'react';
+import { memo, startTransition, useMemo } from 'react';
 import styles from './MyChatRoom.module.css';
 const cx = classnames.bind(styles);
 
 const MyChatRoom = ({ chatRoomId }: { chatRoomId: string }) => {
-  const { data: chatRoom } = useSuspenseQuery(chatRoomByIdQueryOptions(chatRoomId));
-  const { data: messages } = useSuspenseQuery(messageQueryOptions(chatRoomId));
+  const [{ data: chatRoom }, { data: messages }] = useSuspenseQueries({
+    queries: [chatRoomByIdQueryOptions(chatRoomId), messageQueryOptions(chatRoomId)],
+  });
   const setCurChatRoomId = useSetAtom(currentChatRoom);
   const { title, members } = chatRoom;
   const lastMessage = messages.length !== 0 && messages[messages.length - 1];
-  const [, startTransition] = useTransition();
 
   const handleChangeChatRoom = () => {
     startTransition(() => setCurChatRoomId(chatRoomId));
@@ -40,4 +40,4 @@ const MyChatRoom = ({ chatRoomId }: { chatRoomId: string }) => {
   );
 };
 
-export default MyChatRoom;
+export default memo(MyChatRoom);
