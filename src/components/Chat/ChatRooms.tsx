@@ -22,7 +22,7 @@ const ChatRooms = () => {
   const { openModal: chatRoomModal, ModalContainer: ChatRoomModalContainer } = useModal();
   const { openModal: nickNameModal, ModalContainer: NickNameModalContainer } = useModal();
   const toast = useToast();
-  const { data: chatRooms } = useSuspenseQuery({ ...chatRoomQueryOptions() });
+  const { data: chatRooms } = useSuspenseQuery(chatRoomQueryOptions());
   const { mutate } = useCreateChatRoom({
     onSuccess: (chatRoomId: string) => {
       toast.add({ type: 'success', message: '채팅방이 생성되었어요' });
@@ -31,7 +31,10 @@ const ChatRooms = () => {
     onError: () => toast.add({ type: 'failure', message: `잠시 후 다시 시도해주세요.` }),
   });
   const handleCreate = async () => {
-    if (!user) return login();
+    if (!user) {
+      login();
+      return;
+    }
 
     const chatRoomInfo = await chatRoomModal(CreateChatRoomModal);
     if (!chatRoomInfo.ok || !chatRoomInfo.value) return;
