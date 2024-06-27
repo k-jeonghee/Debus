@@ -55,7 +55,7 @@ const ChatForm = ({ chatRoomId }: { chatRoomId: string }) => {
         ...data,
         user: {
           id: uid,
-          name: nickname ? nickname : '',
+          name: nickname || '',
         },
         chatRoomId,
       };
