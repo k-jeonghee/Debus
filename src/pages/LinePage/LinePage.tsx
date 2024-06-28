@@ -15,11 +15,13 @@ const cx = classnames.bind(styles);
 const LinePage = () => {
   const { id: chatRoomId } = useParams();
   assert(chatRoomId !== undefined, '채팅방 id가 존재하지 않습니다.');
-  const { data: chatRoom } = useSuspenseQuery({ ...chatRoomByIdQueryOptions(chatRoomId) });
-  const queryClient = useQueryClient();
+  const { data: chatRoom } = useSuspenseQuery(chatRoomByIdQueryOptions(chatRoomId));
 
+  const queryClient = useQueryClient();
   useEffect(() => {
-    updateMemberListener(chatRoom.id, () => queryClient.refetchQueries(chatRoomByIdQueryOptions(chatRoom.id)));
+    return updateMemberListener(chatRoom.id, () =>
+      queryClient.invalidateQueries(chatRoomByIdQueryOptions(chatRoom.id)),
+    );
   }, [queryClient, chatRoom.id]);
 
   return (

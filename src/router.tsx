@@ -1,25 +1,37 @@
 import Loading from '@components/@common/Loading/Loading';
 import ErrorSupport from '@components/Error/ErrorSupport';
-import HomePage from '@pages/HomePage/HomePage';
-import LinePage from '@pages/LinePage/LinePage';
-import MyPage from '@pages/MyPage/MyPage';
-import OperationPage from '@pages/OperationPage/OperationPage';
 import ProtectedRoute from '@pages/ProtectedRoute/ProtectedRoute';
-import StationPage from '@pages/StationPage/StationPage';
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import App from 'src/App';
 import { loader } from 'src/api/firebase';
+
+const HomePage = lazy(() => import('@pages/HomePage/HomePage'));
+const StationPage = lazy(() => import('@pages/StationPage/StationPage'));
+const LinePage = lazy(() => import('@pages/LinePage/LinePage'));
+const MyPage = lazy(() => import('@pages/MyPage/MyPage'));
+const OperationPage = lazy(() => import('@pages/OperationPage/OperationPage'));
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
     children: [
-      { index: true, element: <HomePage /> },
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<Loading />}>
+            <HomePage />
+          </Suspense>
+        ),
+      },
       {
         path: '/stations',
-        element: <StationPage />,
+        element: (
+          <Suspense fallback={<Loading />}>
+            <StationPage />
+          </Suspense>
+        ),
       },
       {
         path: '/lines/:id',
@@ -31,10 +43,16 @@ export const router = createBrowserRouter([
       },
       {
         path: '/my-page',
-        element: <MyPage />,
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={<Loading />}>
+              <MyPage />
+            </Suspense>
+          </ProtectedRoute>
+        ),
       },
       {
-        path: '/my-operation/:userId',
+        path: '/my-operation',
         element: (
           <ProtectedRoute>
             <Suspense fallback={<Loading />}>

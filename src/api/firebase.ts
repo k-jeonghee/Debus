@@ -1,8 +1,16 @@
 import { createChatRoomMutateType } from '@hooks/services/mutations/chat';
-import { UserTypes } from '@store/atoms/auth';
+import { UserInfo, UserTypes } from '@store/atoms/auth';
 import { MutationFunction } from '@tanstack/react-query';
 import { initializeApp } from 'firebase/app';
-import { GoogleAuthProvider, User, getAuth, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import {
+  GoogleAuthProvider,
+  User,
+  deleteUser,
+  getAuth,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+} from 'firebase/auth';
 import {
   DataSnapshot,
   child,
@@ -11,6 +19,7 @@ import {
   off,
   onChildAdded,
   onChildRemoved,
+  onValue,
   push,
   ref,
   remove,
@@ -46,21 +55,21 @@ const messagesRef = ref(db, 'messages');
 export const login = async () => {
   const res = await signInWithPopup(auth, provider);
   const user = res.user;
-  //boolean 타입은 UserTypes에 할당할 수 없음
+
   const userOrNull: UserTypes | null = await getUserById(user.uid);
   if (!userOrNull) await createUser(user);
+  return userOrNull;
 };
 
 export const logout = () => signOut(auth);
 
-export const onUserStateChange = (callback: (user: UserTypes | null) => void) => {
+export const onUserStateChange = (callback: (user: UserTypes | null) => void) =>
   onAuthStateChanged(auth, async (user) => {
     const updatedUser: UserTypes | null = user ? await getUserById(user.uid) : null;
     callback(updatedUser);
   });
-};
 
-const getUserById = async (userId: string) => {
+export const getUserById = async (userId: string) => {
   const snapshot = await get(child(userRef, userId));
   return snapshot.exists() ? snapshot.val() : null;
 };
@@ -76,6 +85,21 @@ const createUser = async (user: User) => {
   });
 };
 
+//사용자 정보 추가
+type UserInfoMutateType = {
+  userId: string;
+  newInfo: UserInfo;
+};
+export const updateUserInfo: MutationFunction<void, UserInfoMutateType> = async ({ userId, newInfo }) => {
+  const snapshot = await get(child(userRef, userId));
+  const userInfo: UserTypes = snapshot.val();
+  const newUserInfo = {
+    ...userInfo,
+    ...newInfo,
+  };
+  await update(child(userRef, userId), newUserInfo);
+};
+
 /**
 firebase auth 인스턴스 초기화 시 null 할당 문제로 ProtectdRoute를 위함
  */
@@ -84,6 +108,24 @@ export const loader = async () => {
   return auth.currentUser;
 };
 //<<<<<<<<<<<<<<<<<<<인증
+
+//회원탈퇴
+export const deleteUserFromGoogle = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    try {
+      await deleteUserFromDB(user.uid);
+      await deleteUser(user);
+      logout();
+    } catch (error) {
+      throw new Error('회원탈퇴 실패!');
+    }
+  }
+};
+
+const deleteUserFromDB = async (uid: string) => {
+  await remove(child(userRef, uid));
+};
 
 //User: 참여한 채팅방 추가
 const addChatRoomInfoToUser = async (userId: string, chatRoomId: string, nickName: string) => {
@@ -256,11 +298,15 @@ export const addNewMessage: MutationFunction<
   await set(newMessageRef, newMessage); // chatRoomId에 해당하는 자식에 메시지 추가
   return newMessage;
 };
+
 //메시지 데이터 변경 리스너
-export const addMessageListener = (chatRoomId: string, callback: () => void) => {
+export const addMessageListener = (chatRoomId: string, callback: (newMessages: Message[]) => void) => {
   const chatRoomMessagesRef = child(messagesRef, chatRoomId);
-  onChildAdded(chatRoomMessagesRef, (snapshot) => {
-    if (snapshot.exists()) callback();
+  onValue(chatRoomMessagesRef, (snapshot) => {
+    if (snapshot.exists()) {
+      const messages: Message[] = snapshot.val();
+      callback(Object.values(messages));
+    }
   });
 
   //리스너 해제

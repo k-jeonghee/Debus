@@ -19,12 +19,12 @@ function App() {
       <ModalProvider>
         <QueryClientProvider client={queryClient}>
           <ErrorBoundary Fallback={ErrorFallback} onReset={reset}>
-            <div id="app" className={darkMode ? 'dark' : 'light'}>
+            <main id="app" className={darkMode ? 'dark' : 'light'}>
               <Header />
               <div className="container">
                 <Outlet />
               </div>
-            </div>
+            </main>
           </ErrorBoundary>
           <ReactQueryDevtools initialIsOpen={true} />
         </QueryClientProvider>

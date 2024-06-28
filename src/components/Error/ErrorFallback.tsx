@@ -12,7 +12,7 @@ const ErrorFallback = ({ error, onReset }: ErrorFallbackProps) => {
   return (
     <div className={cx('container')}>
       <h1>{error?.message}</h1>
-      <Button text="재시도" onClick={onReset} variant="accent" />
+      <Button text="재시도" onClick={onReset} variant="accent" name="retry" />
     </div>
   );
 };

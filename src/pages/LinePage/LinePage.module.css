@@ -1,17 +1,18 @@
 .container {
-    display: flex;
+  display: flex;
+  justify-content: center;
 }
 
 .chat {
-    width: 100%;
+  width: 75%;
 }
 
 .side {
-    width: 300px;
+  width: 25%;
 }
 
 @media screen and (max-width: 1280px) {
-    .side {
-        display: none;
-    }
+  .side {
+    display: none;
+  }
 }

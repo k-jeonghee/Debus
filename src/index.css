@@ -1,5 +1,10 @@
-@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css);
 @import './reset.css';
+
+@font-face {
+  font-family: 'Noto Sans KR', sans-serif;
+  src: url(https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300..600) format('woff2');
+  font-display: swap;
+}
 
 :root {
   --color-bg: #fdfffd;
@@ -15,8 +20,8 @@
 }
 
 * {
-  font-family: 'Spoqa Han Sans Neo', sans-serif;
   box-sizing: border-box;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 html,

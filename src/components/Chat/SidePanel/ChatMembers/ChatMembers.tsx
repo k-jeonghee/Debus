@@ -1,9 +1,10 @@
 import { authAtom } from '@store/atoms/auth';
 
+import { FaCrown } from '@react-icons/all-files/fa/FaCrown';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { memo } from 'react';
-import { FaCrown } from 'react-icons/fa';
+
 import { Member } from 'src/@types/chat';
 import styles from './ChatMembers.module.css';
 const cx = classnames.bind(styles);

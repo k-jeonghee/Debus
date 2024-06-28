@@ -1,12 +1,14 @@
 import Textarea from '@components/@common/Textarea/Textarea';
 import { useAddMessage } from '@hooks/services/mutations/chat';
+import { chatRoomByIdQueryOptions } from '@hooks/services/queries/chat';
+import { BiPaperPlane } from '@react-icons/all-files/bi/BiPaperPlane';
+import { BsFillPlusCircleFill } from '@react-icons/all-files/bs/BsFillPlusCircleFill';
 import { authAtom } from '@store/atoms/auth';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { ChangeEvent, KeyboardEventHandler, memo, useCallback, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { BsPlusCircleFill } from 'react-icons/bs';
-import { PiPaperPlaneTiltFill } from 'react-icons/pi';
 import { PuffLoader } from 'react-spinners';
 import { Message } from 'src/@types/chat';
 import { uploadImage } from 'src/api/uploader';
@@ -29,12 +31,19 @@ type FileMessage = {
 
 type MessageData = TextMessage | FileMessage;
 
-const ChatForm = ({ nickName, chatRoomId }: { nickName: string; chatRoomId: string }) => {
+const ChatForm = ({ chatRoomId }: { chatRoomId: string }) => {
   const { id: uid } = useAtomValue(authAtom);
   const methods = useForm<FormData>();
-  const { mutate } = useAddMessage(chatRoomId, {
+  const { mutate } = useAddMessage({
     onError: () => toast.add({ type: 'failure', message: '메시지 전송 실패' }),
   });
+  const { data: memberInfo } = useSuspenseQuery({
+    ...chatRoomByIdQueryOptions(chatRoomId),
+    select: (data) => data.members.find((member) => member.userId === uid),
+  });
+
+  const nickname = memberInfo && memberInfo.name;
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
@@ -46,14 +55,14 @@ const ChatForm = ({ nickName, chatRoomId }: { nickName: string; chatRoomId: stri
         ...data,
         user: {
           id: uid,
-          name: nickName,
+          name: nickname || '',
         },
         chatRoomId,
       };
 
       return message;
     },
-    [uid, nickName, chatRoomId],
+    [uid, nickname, chatRoomId],
   );
 
   //>>>>>>>>>>>>>>>>>>>>>>>>>>파일 업로드
@@ -122,15 +131,20 @@ const ChatForm = ({ nickName, chatRoomId }: { nickName: string; chatRoomId: stri
                   onKeyDown={handleEnterSubmit}
                 />
                 <div className={cx('btn-group')}>
-                  <button className={cx('file-btn')} onClick={handleOpenFile} disabled={isLoading}>
+                  <button className={cx('file-btn')} onClick={handleOpenFile} disabled={isLoading} name="file-uploader">
                     {isLoading ? (
                       <PuffLoader color="#ff6636" loading size={24} />
                     ) : (
-                      <BsPlusCircleFill className={cx({ disabled: isLoading })} />
+                      <BsFillPlusCircleFill className={cx({ disabled: isLoading })} />
                     )}
                   </button>
-                  <button type="submit" className={cx('submit-btn', { active: field.value })} disabled={!field.value}>
-                    <PiPaperPlaneTiltFill />
+                  <button
+                    type="submit"
+                    className={cx('submit-btn', { active: field.value })}
+                    disabled={!field.value}
+                    name="submit-message"
+                  >
+                    <BiPaperPlane />
                   </button>
                 </div>
               </>

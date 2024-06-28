@@ -38,8 +38,8 @@ const UpdateNickName = ({ onSubmit, onAbort }: ModalContentProps<Name>) => {
           />
           <p className={cx('error-msg')}>{errors.nickName?.message}</p>
           <ModalButtonGroup>
-            <Button text="취소" variant="default" onClick={onAbort} />
-            <Button text="참여하기" variant="accent" type="submit" />
+            <Button text="취소" variant="default" onClick={onAbort} name="cancel" />
+            <Button text="참여하기" variant="accent" type="submit" name="join" />
           </ModalButtonGroup>
         </form>
       </ModalContent>

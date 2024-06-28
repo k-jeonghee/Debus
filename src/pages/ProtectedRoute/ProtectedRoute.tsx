@@ -1,12 +1,11 @@
-import { User } from 'firebase/auth';
+import { baseAuthAtom } from '@store/atoms/auth';
+import { useAtomValue } from 'jotai';
 import { PropsWithChildren } from 'react';
-import { Navigate, useLoaderData, useParams } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children }: PropsWithChildren) => {
-  const user = useLoaderData() as User;
-  const { userId } = useParams();
-
-  if (!user || user.uid !== userId) {
+  const user = useAtomValue(baseAuthAtom);
+  if (!user) {
     return <Navigate to="/" />;
   }
 

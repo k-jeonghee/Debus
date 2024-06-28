@@ -1,6 +1,5 @@
-import { messageByIdQueryOptions } from '@hooks/services/queries/chat';
 import { UserTypes } from '@store/atoms/auth';
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query';
+import { UseMutationOptions, useMutation } from '@tanstack/react-query';
 import { ChatRoomInfo, Message } from 'src/@types/chat';
 import { addNewMessage, createChatRoom } from 'src/api/firebase';
 
@@ -14,11 +13,10 @@ export const useCreateChatRoom = (options: MutateOptionsType<string, createChatR
   });
 
 export type addMessageMutateType = { chatRoomId: string; message: Omit<Message, 'id' | 'timestamp'> };
-export const useAddMessage = (chatRoomId: string, options: MutateOptionsType<Message, addMessageMutateType>) => {
-  const queryClient = useQueryClient();
+export const useAddMessage = (options: MutateOptionsType<Message, addMessageMutateType>) => {
   return useMutation({
     mutationFn: addNewMessage,
-    onSuccess: (v: Message) => queryClient.invalidateQueries(messageByIdQueryOptions(chatRoomId, v.id)),
+
     ...options,
   });
 };
