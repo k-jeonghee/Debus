@@ -1,13 +1,14 @@
 {
   "name": "debus",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "vercel deploy"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.1",
