@@ -1,7 +1,7 @@
 import classnames from 'classnames/bind';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { memo } from 'react';
+import { forwardRef, memo } from 'react';
 import { Message } from 'src/@types/chat';
 import Bus from 'src/assets/bus.svg?react';
 import styles from './ChatMessage.module.css';
@@ -9,15 +9,15 @@ const cx = classnames.bind(styles);
 
 type PropsType = {
   message: Message;
-} & {
+
   isMyMessage: boolean;
 };
 
-const ChatMessage = ({ message, isMyMessage }: PropsType) => {
+const ChatMessage = forwardRef<HTMLDivElement, PropsType>(({ message, isMyMessage }, ref) => {
   const timeAgo = format(Number(message.timestamp), 'a HH:mm', { locale: ko });
 
   return (
-    <div className={cx('container', { me: isMyMessage })}>
+    <div className={cx('container', { me: isMyMessage })} ref={ref}>
       <div className={cx('profile')}>
         <Bus width="20" height="20" fill="#1e2226" />
       </div>
@@ -34,6 +34,8 @@ const ChatMessage = ({ message, isMyMessage }: PropsType) => {
       </div>
     </div>
   );
-};
+});
+
+ChatMessage.displayName = 'ChatMessage';
 
 export default memo(ChatMessage);
