@@ -5,8 +5,9 @@ import ChatRoom from '@components/Chat/ChatRoom/ChatRoom';
 import { useCreateChatRoom } from '@hooks/services/mutations/chat';
 import { chatRoomQueryOptions } from '@hooks/services/queries/chat';
 import { useModal } from '@hooks/useModal';
+import { IoRefreshCircleOutline } from '@react-icons/all-files/io5/IoRefreshCircleOutline';
 import { baseAuthAtom } from '@store/atoms/auth';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { memo } from 'react';
@@ -46,10 +47,16 @@ const ChatRooms = () => {
     mutate({ user, chatRoomInfo: chatRoomInfo.value, nickName });
   };
 
+  const queryClient = useQueryClient();
+  const handleRefresh = () => queryClient.refetchQueries(chatRoomQueryOptions());
+
   return (
     <section className={cx('container')}>
       <nav className={cx('nav')}>
-        <h1>정류장</h1>
+        <div className={cx('menu')}>
+          <h1>정류장</h1>
+          <IoRefreshCircleOutline size={28} className={cx('refresh')} onClick={handleRefresh} />
+        </div>
         <Button text="배차하기" variant="accent" onClick={handleCreate} name="create-chatRoom" />
       </nav>
       {chatRooms && (
