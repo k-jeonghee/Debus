@@ -53,7 +53,7 @@ const Form = ({
         })}
       />
       <p className={cx('error-msg')}>{errors.desc?.message}</p>
-      <label htmlFor="options">옵션</label>
+      <label htmlFor="options">옵션(선택)</label>
       <input type="text" {...register('options')} placeholder=",(콤마)로 구분해주세요." />
       {children}
     </form>
