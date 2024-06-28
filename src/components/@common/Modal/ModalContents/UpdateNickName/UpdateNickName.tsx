@@ -23,7 +23,7 @@ const UpdateNickName = ({ onSubmit, onAbort }: ModalContentProps<Name>) => {
       <ModalHeader title={'닉네임 설정'} onClose={onAbort} />
       <ModalContent>
         <form className={cx('form-container')} onSubmit={handleSubmit(onSubmit)}>
-          <label htmlFor="nickName">닉네임</label>
+          <label htmlFor="nickName">채팅방에서 사용할 닉네임</label>
           <input
             type="text"
             id="nickName"

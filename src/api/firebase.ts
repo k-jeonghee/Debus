@@ -57,7 +57,9 @@ export const login = async () => {
   const user = res.user;
 
   const userOrNull: UserTypes | null = await getUserById(user.uid);
-  if (!userOrNull) await createUser(user);
+  if (!userOrNull) {
+    return await createUser(user);
+  }
   return userOrNull;
 };
 
@@ -76,13 +78,15 @@ export const getUserById = async (userId: string) => {
 
 const createUser = async (user: User) => {
   assert(user !== null, '사용자가 없습니다.');
-  return set(child(userRef, user.uid), {
+  await set(child(userRef, user.uid), {
     id: user.uid,
     name: user.displayName,
     email: user.email,
     photoURL: user.photoURL,
     chatRooms: [],
   });
+  const userInfo: UserTypes = await getUserById(user.uid);
+  return userInfo;
 };
 
 //사용자 정보 추가
