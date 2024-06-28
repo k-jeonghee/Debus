@@ -14,8 +14,8 @@
   }
   & p {
     margin-bottom: 12px;
-    font-size: 1.1rem;
   }
+
   & input {
     background: var(--color-bg-dark);
     padding: 4px 12px;
@@ -79,4 +79,15 @@
 
 .delete {
   text-align: right;
+}
+
+.error-msg {
+  font-size: 0.8rem;
+  color: rgb(255, 64, 0);
+}
+
+.options-info {
+  font-size: 0.8rem;
+  margin-top: 8px;
+  color: #a2a6b5;
 }

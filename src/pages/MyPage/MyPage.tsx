@@ -2,28 +2,45 @@ import Button from '@components/@common/Button/Button';
 import DeleteUser from '@components/@common/Modal/ModalContents/DeleteUser/DeleteUser';
 import { userInfoQueryOptions } from '@hooks/services/queries/user';
 import { useModal } from '@hooks/useModal';
-import { UserInfo, authAtom } from '@store/atoms/auth';
+import { authAtom } from '@store/atoms/auth';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { deleteUserFromGoogle, updateUserInfo } from 'src/api/firebase';
 import { useToast } from 'src/context/ToastContext';
 import styles from './MyPage.module.css';
 const cx = classnames.bind(styles);
 
+type FormValue = {
+  nickname: string;
+  sns: string;
+  options: string;
+};
+
 const MyPage = () => {
   const { id, name, email, photoURL } = useAtomValue(authAtom);
   const [isEdit, setIsEdit] = useState(false);
-  const { register, handleSubmit, reset, setValue } = useForm<UserInfo>();
   const {
     data: { nickname, sns, options },
   } = useSuspenseQuery(userInfoQueryOptions(id));
+  const optionsString = options && options.join(',');
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValue>({
+    values: {
+      nickname,
+      sns,
+      options: optionsString,
+    },
+  });
+
   const toast = useToast();
   const { openModal, ModalContainer } = useModal();
-  const optionsString = options && (options as string[]).join(',');
-
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: updateUserInfo,
@@ -35,18 +52,8 @@ const MyPage = () => {
     onError: () => toast.add({ type: 'failure', message: '잠시 후 다시 시도해주세요.' }),
   });
 
-  /**
-   * input value에 데이터 보여주기 위함
-   */
-  useEffect(() => {
-    setValue('nickname', nickname);
-    setValue('sns', sns);
-    setValue('options', optionsString);
-  }, [setValue, nickname, sns, optionsString]);
-
-  const handleEdit: SubmitHandler<UserInfo> = (data) => {
-    mutate({ userId: id, newInfo: { ...data } });
-    reset();
+  const handleEdit: SubmitHandler<FormValue> = (data) => {
+    mutate({ userId: id, newInfo: { ...data, options: data.options.split(/[,.]/) } });
   };
 
   const handleDelete = async () => {
@@ -80,14 +87,34 @@ const MyPage = () => {
         <form onSubmit={handleSubmit(handleEdit)}>
           <label htmlFor="nickname">닉네임</label>
           {!isEdit ? <p>{nickname ? nickname : '-'}</p> : <input id="nickname" type="text" {...register('nickname')} />}
-          <label htmlFor="options">정보</label>
+          <label htmlFor="options">
+            정보
+            <p className={cx('options-info')}>항목을 쉼표(,) 또는 점(.)으로 구분해주세요.</p>
+          </label>
           {!isEdit ? (
             <p>{optionsString ? optionsString : '-'}</p>
           ) : (
-            <input id="options" type="text" {...register('options')} />
+            <input
+              id="options"
+              type="text"
+              {...register('options', {
+                validate: (value) => (value.includes(' ') ? '공백이 포함되어 있어요.' : true),
+              })}
+            />
           )}
+          <p className={cx('error-msg')}>{errors.options?.message}</p>
           <label htmlFor="sns">SNS</label>
-          {!isEdit ? <p>{sns ? sns : '-'}</p> : <input id="sns" type="text" {...register('sns')} />}
+          {!isEdit ? (
+            sns ? (
+              <a href={sns} target="_blank" rel="noreferrer">
+                🔗{sns}
+              </a>
+            ) : (
+              <p>-</p>
+            )
+          ) : (
+            <input id="sns" type="text" {...register('sns')} />
+          )}
           {isEdit && (
             <div className={cx('btn-group')}>
               <Button text="취소" variant="default" onClick={() => setIsEdit(false)} name="cancel" />

@@ -12,7 +12,7 @@ export type UserTypes = {
 
 export type UserInfo = {
   nickname: string;
-  options: string;
+  options: string[];
   sns: string;
 };
 

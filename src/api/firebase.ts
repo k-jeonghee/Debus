@@ -96,7 +96,6 @@ export const updateUserInfo: MutationFunction<void, UserInfoMutateType> = async 
   const newUserInfo = {
     ...userInfo,
     ...newInfo,
-    options: newInfo.options.split(','),
   };
   await update(child(userRef, userId), newUserInfo);
 };
