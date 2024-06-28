@@ -22,8 +22,14 @@ const ActionModal = ({ onSubmit, onAbort, actionInfo }: ActionModalProps<boolean
       <ModalContent>
         <p className={cx('message')}>{actionInfo.message}</p>
         <ModalButtonGroup>
-          <Button text="취소" variant="default" onClick={onAbort} />
-          <Button text={displayName[actionInfo.type]} variant={actionInfo.type} type="submit" onClick={handleClick} />
+          <Button text="취소" variant="default" onClick={onAbort} name="cancel" />
+          <Button
+            text={displayName[actionInfo.type]}
+            variant={actionInfo.type}
+            type="submit"
+            onClick={handleClick}
+            name="submit"
+          />
         </ModalButtonGroup>
       </ModalContent>
     </ModalTemplate>
