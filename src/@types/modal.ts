@@ -22,6 +22,7 @@ export type ModalContentProps<T = unknown> = {
 export type ActionInfo = {
   type: ActionType;
   message: string;
+  displayCancel: boolean;
 };
 
 export type ActionModalProps<T = unknown> = {

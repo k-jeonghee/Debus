@@ -24,6 +24,7 @@ const SidePanel = ({ chatRoom }: { chatRoom: ChatRoomInfoType }) => {
     const result = await openModal(ActionModal, {
       type: 'exit',
       message: '채팅방에서 나가면 기록을 복구할 수 없어요.',
+      displayCancel: true,
     });
     if (!result.ok) return;
     const curMembersCount = chatRoom.members.length;

@@ -29,6 +29,7 @@ export const useModal = () => {
           actionInfo: actionInfo && {
             type: actionInfo.type,
             message: actionInfo.message,
+            displayCancel: actionInfo.displayCancel,
           },
         };
         open(modal);
