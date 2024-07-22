@@ -2,15 +2,7 @@ import { createChatRoomMutateType } from '@hooks/services/mutations/chat';
 import { UserInfo, UserTypes } from '@store/atoms/auth';
 import { MutationFunction } from '@tanstack/react-query';
 import { initializeApp } from 'firebase/app';
-import {
-  GoogleAuthProvider,
-  User,
-  deleteUser,
-  getAuth,
-  onAuthStateChanged,
-  signInWithPopup,
-  signOut,
-} from 'firebase/auth';
+import { User, deleteUser, getAuth, onAuthStateChanged, signInAnonymously, signOut } from 'firebase/auth';
 import {
   DataSnapshot,
   child,
@@ -45,7 +37,10 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 export const storage = getStorage(app);
 
-const provider = new GoogleAuthProvider();
+/**
+ * 구글 로그인 시 필요한 provider
+ */
+// const provider = new GoogleAuthProvider();
 
 const userRef = ref(db, 'users');
 const chatRoomRef = ref(db, 'lines');
@@ -53,7 +48,7 @@ const messagesRef = ref(db, 'messages');
 
 //>>>>>>>>>>>>>>>>>>>인증
 export const login = async () => {
-  const res = await signInWithPopup(auth, provider);
+  const res = await signInAnonymously(auth);
   const user = res.user;
 
   const userOrNull: UserTypes | null = await getUserById(user.uid);
