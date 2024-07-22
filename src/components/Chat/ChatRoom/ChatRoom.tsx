@@ -7,7 +7,7 @@ import classnames from 'classnames/bind';
 import { useAtomValue } from 'jotai';
 import { memo } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { bindUserAndChatRoom, checkUserInChatRoom, login } from 'src/api/firebase';
+import { bindUserAndChatRoom, checkUserInChatRoom } from 'src/api/firebase';
 import { useToast } from 'src/context/ToastContext';
 import { assert } from 'src/utils/assert';
 import styles from './ChatRoom.module.css';
@@ -23,10 +23,20 @@ const ChatRoom = ({ chatRoomId }: { chatRoomId: string }) => {
 
   const handleClick = async () => {
     if (!user) {
-      await login();
-      navigate('/');
+      toast.add({
+        type: 'failure',
+        message: '로그인이 필요해요.',
+      });
       return;
     }
+    /**
+     * 구글 로그인 팝업 연결 로직
+     */
+    // if (!user) {
+    //   await login();
+    //   navigate('/');
+    //   return;
+    // }
     assert(user !== null, '사용자 정보가 없습니다.');
     try {
       const joined = await checkUserInChatRoom(user, id);
