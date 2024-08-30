@@ -31,7 +31,7 @@
 - light/dark 모드
 - 실시간 데이터 동기화
   <p align="center">
-    <img src="https://github.com/user-attachments/assets/19816be7-2dd5-4284-9d6e-9a3c7a90c5bb" alt="sync">
+    <img src="https://github.com/user-attachments/assets/8e0696cc-86a5-4307-9a3e-7ca8e268bb77" alt="sync">
   </p>
 
 - 채팅방별 닉네임 설정
