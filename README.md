@@ -31,25 +31,25 @@
 - light/dark 모드
 - 실시간 데이터 동기화
   <p align="center">
-    <img src="https://github.com/user-attachments/assets/bf891c22-2828-4abc-a07d-025903e859f3" alt="sync">
+    <img src="https://github.com/user-attachments/assets/19816be7-2dd5-4284-9d6e-9a3c7a90c5bb" alt="sync">
   </p>
 
 - 채팅방별 닉네임 설정
   <p align="center">
-    <img src="https://github.com/user-attachments/assets/faf300d5-328b-4453-b1e4-b2eb0138aba0" alt="nickname">
+    <img src="https://github.com/user-attachments/assets/3a174539-b94a-43ce-9a0a-c4fe37760201" alt="nickname">
   </p>
 
 - 사용자별 참여중인 채팅방 모아보기
   <p align="center">
-    <img src="https://github.com/user-attachments/assets/24a11f41-66c0-46fc-a960-9377c6e97f31" alt="operation">
+    <img src="https://github.com/user-attachments/assets/e5fa1339-4e80-4b8a-befd-d5230547371d" alt="operation">
   </p>
 
 - 비동기 처리가 가능한 전역 모달
   <p align="center">
-    <img src="https://github.com/user-attachments/assets/4a54a889-1e8f-4343-ae34-8c663079f89e" alt="modal1">
+    <img src="https://github.com/user-attachments/assets/39a9b0f5-dd9b-4835-9202-4fbc3e8612db" alt="modal1">
   </p>
 
 - 마이페이지 정보 수정
   <p align="center">
-    <img src="https://github.com/user-attachments/assets/ce0a13f7-b167-4597-bd24-0cbbe49d1e4d" alt="mypage">
+    <img src="https://github.com/user-attachments/assets/42277e50-4eac-41ee-8561-c794c4f352e8" alt="mypage">
   </p>
