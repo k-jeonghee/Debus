@@ -74,15 +74,27 @@ const MyPage = () => {
         <h1>마이페이지</h1>
         {!isEdit && <Button text="수정" onClick={() => setIsEdit(true)} name="edit" />}
       </div>
-      <div className={cx('info')}>
-        <img src={photoURL ? photoURL : ''} alt="" />
+      {/* demo에 필요 없는 속성 임시 제거 */}
+      {/* <div className={cx('info')}>
+        {photoURL ? <img src={photoURL} alt="profile" /> : <Bus width="36" height="36" fill="#656565" />}
         <div>
-          <label htmlFor="name">이름</label>
+          <label htmlFor="name">익명</label>
           <p id="name">{name}</p>
           <label htmlFor="email">이메일</label>
           <p id="email">{email}</p>
         </div>
-      </div>
+      </div> */}
+      {/* {email && (
+        <div className={cx('info')}>
+          <img src={photoURL ? photoURL : ''} alt="" />
+          <div>
+            <label htmlFor="name">이름</label>
+            <p id="name">{name}</p>
+            <label htmlFor="email">이메일</label>
+            <p id="email">{email}</p>
+          </div>
+        </div>
+      )} */}
       <div className={cx('extra-info')}>
         <form onSubmit={handleSubmit(handleEdit)}>
           <label htmlFor="nickname">닉네임</label>
