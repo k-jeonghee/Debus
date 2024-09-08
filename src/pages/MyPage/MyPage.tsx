@@ -20,7 +20,7 @@ type FormValue = {
 };
 
 const MyPage = () => {
-  const { id, name, email, photoURL } = useAtomValue(authAtom);
+  const { id } = useAtomValue(authAtom);
   const [isEdit, setIsEdit] = useState(false);
   const {
     data: { nickname, sns, options },
