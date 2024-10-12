@@ -31,7 +31,7 @@ React, TypeScript, PostCSS, RadixUI, Jotai, TanStack-Query, React-Router-Dom, Fi
 
 **자세히**
 
-[🔗 프로젝트 알아보기](https://heeheehoho.notion.site/Debus-13d6dc51036b429e8bc2d5ed62288a97?pvs=4)
+[🔗 프로젝트 알아보기](https://heeheehoho.notion.site/Debus-11de25c2143a80e98d9cd2333628125d?pvs=74)
 
 - 상세한 기획 배경 및 트러블 슈팅 기록은 위 링크에서 확인하실 수 있습니다.
 
